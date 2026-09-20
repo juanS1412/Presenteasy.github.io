@@ -1,0 +1,2537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presenteasy · Learn & Play</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ===== RESET & GLOBAL ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #15102a;
+      color: #f0ecf5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2a1f45;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #f093fb, #f5576c, #4facfe);
+      border-radius: 20px;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      background: rgba(21, 16, 42, 0.88);
+      backdrop-filter: blur(18px);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .navbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe, #43e97b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar .brand img {
+      height: 42px;
+      width: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(79, 172, 254, 0.3);
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px 8px;
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links li button {
+      background: rgba(255, 255, 255, 0.07);
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #d0cce0;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(4px);
+    }
+    .nav-links li button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .nav-links li button.active {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    /* ===== NAVBAR CONTROLS (theme + lang) ===== */
+    .navbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 10px;
+    }
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f0d060;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(1.1) rotate(20deg);
+      box-shadow: 0 0 24px rgba(240, 208, 96, 0.5);
+    }
+    body.light-mode .theme-toggle {
+      background: rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #6a5f88;
+    }
+    body.light-mode .theme-toggle:hover {
+      background: rgba(0, 0, 0, 0.12);
+      color: #2a1f45;
+      box-shadow: 0 0 24px rgba(106, 95, 136, 0.4);
+    }
+
+    /* ===== BOTONES DE IDIOMA ===== */
+    .lang-toggle {
+      display: flex;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .lang-toggle button {
+      background: transparent;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 30px;
+      color: #b0aac0;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+    .lang-toggle button.active-lang {
+      background: linear-gradient(135deg, #4facfe, #43e97b);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    }
+    .lang-toggle button:hover:not(.active-lang) {
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+    }
+
+    /* ===== PAGES ===== */
+    .page {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 30px 24px 40px;
+      overflow-y: auto;
+      animation: pageIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      background: radial-gradient(ellipse at 30% 20%, rgba(245, 87, 108, 0.06), transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(79, 172, 254, 0.06), transparent 60%),
+        #15102a;
+      transition: background 0.4s ease;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes pageIn {
+      0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe, #43e97b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-subtitle {
+      text-align: center;
+      color: #c8c0d8;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      line-height: 1.7;
+      transition: color 0.4s ease;
+    }
+
+    /* ===== WELCOME ===== */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      padding: 20px 20px 60px;
+      background: radial-gradient(ellipse at 20% 30%, rgba(245, 87, 108, 0.08), transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(79, 172, 254, 0.08), transparent 50%),
+        #15102a;
+      min-height: 100%;
+      transition: background 0.4s ease;
+    }
+    #welcome .logo-wrap {
+      margin-top: 10px;
+    }
+    #welcome .logo-wrap img {
+      height: 260px; /* Aumentado de 180px a 260px */
+      width: auto;
+      border-radius: 28px;
+      box-shadow: 0 0 90px rgba(79, 172, 254, 0.28), 0 0 160px rgba(245, 87, 108, 0.12);
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 20px;
+      transition: transform 0.5s ease;
+    }
+    #welcome .logo-wrap img:hover { transform: scale(1.04) rotate(-1deg); }
+    #welcome h1 {
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe, #43e97b, #f093fb);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 5s ease-in-out infinite;
+      margin-top: 12px;
+    }
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    #welcome .intro-text {
+      max-width: 750px;
+      font-size: 1.15rem;
+      color: #d8d0ec;
+      line-height: 1.9;
+      margin: 16px auto 10px;
+      padding: 0 20px;
+      transition: color 0.4s ease;
+    }
+    #welcome .intro-text strong { color: #f5576c; }
+    #welcome .objective {
+      background: rgba(255, 255, 255, 0.06);
+      border-left: 4px solid #4facfe;
+      padding: 18px 28px;
+      border-radius: 16px;
+      max-width: 650px;
+      margin: 16px auto 24px;
+      backdrop-filter: blur(4px);
+      transition: background 0.4s ease;
+    }
+    #welcome .objective p { font-size: 1.05rem; color: #d0c8e8; line-height: 1.7; transition: color 0.4s ease; }
+    #welcome .objective i { color: #f093fb; margin-right: 8px; }
+
+    .welcome-badge {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .welcome-badge .badge-item {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 10px 26px;
+      border-radius: 60px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      font-weight: 500;
+      color: #e0d8f0;
+      transition: all 0.3s ease;
+    }
+    .welcome-badge .badge-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    }
+    .welcome-badge .badge-item i { margin-right: 8px; color: #f093fb; }
+
+    .glow-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      border: none;
+      padding: 12px 34px;
+      border-radius: 60px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(245,87,108,0.3);
+      transition: all 0.3s ease;
+      margin-top: 24px;
+      margin-bottom: 20px;
+    }
+    .glow-btn:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(245,87,108,0.6); }
+
+    /* ===== GAMES ===== */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 28px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 28px;
+      padding: 28px 24px 32px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      transition: all 0.4s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: conic-gradient(from 0deg, transparent, rgba(245,87,108,0.05), transparent, rgba(79,172,254,0.05), transparent);
+      animation: rotateBg 14s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .game-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.08);
+    }
+    .game-card .card-content { position: relative; z-index: 1; }
+    .difficulty {
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .difficulty.easy { background: rgba(67,233,123,0.25); color: #43e97b; }
+    .difficulty.medium { background: rgba(251,191,36,0.25); color: #fbbf24; }
+    .difficulty.hard { background: rgba(245,87,108,0.25); color: #f5576c; }
+    .difficulty.expert { background: rgba(192,38,211,0.25); color: #c026d3; }
+    .game-card h3 { font-size: 1.4rem; margin-bottom: 6px; color: #fff; transition: color 0.4s ease; }
+    .game-card p { color: #c8c0d8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px; transition: color 0.4s ease; }
+    .play-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      border: none;
+      padding: 10px 28px;
+      border-radius: 40px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(245,87,108,0.3);
+    }
+    .play-btn:hover { transform: scale(1.06); box-shadow: 0 8px 32px rgba(245,87,108,0.5); }
+    .question-count { color: #a098b8; font-size: 0.8rem; margin-top: 10px; transition: color 0.4s ease; }
+
+    /* ===== VERBS ===== */
+    .verbs-container { max-width: 1300px; margin: 0 auto; }
+    .verbs-tabs {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .verbs-tabs button {
+      background: rgba(255,255,255,0.06);
+      border: none;
+      padding: 8px 24px;
+      border-radius: 40px;
+      color: #ccc;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .verbs-tabs button.active {
+      background: linear-gradient(135deg, #4facfe, #43e97b);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(79,172,254,0.3);
+    }
+    .verbs-tabs button:hover { background: rgba(255,255,255,0.12); }
+    .verbs-search {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .verbs-search input {
+      padding: 12px 24px;
+      border-radius: 60px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 1rem;
+      width: 340px;
+      max-width: 100%;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .verbs-search input:focus {
+      border-color: rgba(79,172,254,0.4);
+      box-shadow: 0 0 40px rgba(79,172,254,0.08);
+    }
+    .verbs-search input::placeholder { color: #8880a0; }
+    .verbs-stats {
+      text-align: center;
+      color: #a098b8;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      transition: color 0.4s ease;
+    }
+    .verbs-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .verb-item {
+      background: rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .verb-item:hover {
+      background: rgba(255,255,255,0.10);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      border-color: rgba(255,255,255,0.10);
+    }
+    .verb-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .verb-row .verb-form-label {
+      font-weight: 300;
+      color: #8880a0;
+      min-width: 70px;
+      font-size: 0.85rem;
+      transition: color 0.4s ease;
+    }
+    .verb-row .verb-form-value {
+      font-weight: 500;
+      color: #e0d8f0;
+      font-size: 0.95rem;
+      flex: 1;
+      transition: color 0.4s ease;
+    }
+    .verb-row .verb-audio-btn {
+      background: rgba(79,172,254,0.12);
+      border: none;
+      color: #4facfe;
+      font-size: 0.85rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .verb-row .verb-audio-btn:hover {
+      background: rgba(79,172,254,0.25);
+      color: #43e97b;
+      transform: scale(1.05);
+    }
+    .verb-es {
+      font-size: 0.95rem;
+      color: #c8c0d8;
+      margin-top: 6px;
+      transition: color 0.4s ease;
+    }
+    .verb-type {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      padding: 2px 14px;
+      border-radius: 40px;
+      align-self: flex-start;
+      margin-top: 6px;
+    }
+    .verb-type.regular { background: rgba(79,172,254,0.15); color: #4facfe; }
+    .verb-type.irregular { background: rgba(245,87,108,0.15); color: #f5576c; }
+
+    /* ===== TEXTS ===== */
+    .texts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .text-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 24px;
+      padding: 28px 24px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.4s ease;
+    }
+    .text-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.10);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.08);
+    }
+    .text-card .text-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; transition: color 0.4s ease; }
+    .text-card .text-body {
+      color: #d0c8e0;
+      line-height: 1.8;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      border-left: 3px solid rgba(79,172,254,0.2);
+      transition: color 0.4s ease, background 0.4s ease;
+    }
+    .text-card .text-questions .q-item {
+      background: rgba(255,255,255,0.03);
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 8px;
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .text-card .text-questions .q-item strong { color: #f093fb; }
+    .text-card .text-questions .q-item .answer {
+      display: block;
+      margin-top: 6px;
+      color: #4facfe;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .text-card .text-questions .q-item .answer.hidden { display: none; }
+    .show-answers-btn {
+      background: rgba(79,172,254,0.12);
+      border: 1px solid rgba(79,172,254,0.15);
+      padding: 8px 24px;
+      border-radius: 40px;
+      color: #4facfe;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+    }
+    .show-answers-btn:hover { background: rgba(79,172,254,0.22); }
+
+    /* ===== VOCAB ===== */
+    .vocab-container { max-width: 1300px; margin: 0 auto; }
+    .vocab-search {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .vocab-search input {
+      padding: 14px 28px;
+      border-radius: 60px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 1rem;
+      width: 340px;
+      max-width: 100%;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .vocab-search input:focus {
+      border-color: rgba(79,172,254,0.4);
+      box-shadow: 0 0 40px rgba(79,172,254,0.08);
+    }
+    .vocab-search input::placeholder { color: #8880a0; }
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .vocab-item {
+      background: rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 14px 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .vocab-item:hover {
+      background: rgba(255,255,255,0.10);
+      transform: scale(1.03) translateY(-3px);
+      border-color: rgba(255,255,255,0.10);
+    }
+    .vocab-item .vocab-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .vocab-item .vocab-word {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      transition: color 0.4s ease;
+    }
+    .vocab-item .vocab-audio-btn {
+      background: none;
+      border: none;
+      color: #4facfe;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 30px;
+      transition: all 0.2s ease;
+    }
+    .vocab-item .vocab-audio-btn:hover {
+      background: rgba(79,172,254,0.15);
+      color: #43e97b;
+      transform: scale(1.1);
+    }
+    .vocab-item .vocab-meaning {
+      font-size: 0.85rem;
+      color: #c8c0d8;
+      margin-top: 4px;
+      transition: color 0.4s ease;
+    }
+    .vocab-item .vocab-tag {
+      display: inline-block;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 2px 12px;
+      border-radius: 40px;
+      background: rgba(245,87,108,0.12);
+      color: #f5576c;
+      margin-top: 6px;
+      align-self: flex-start;
+    }
+    .vocab-count { text-align: center; color: #a098b8; font-size: 0.9rem; margin-bottom: 16px; transition: color 0.4s ease; }
+
+    /* ===== SPEAKING ===== */
+    .speaking-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .speaking-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 28px;
+      padding: 28px 26px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.4s ease;
+    }
+    .speaking-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.10);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.08);
+    }
+    .speaking-card .conv-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #fff;
+      transition: color 0.4s ease;
+    }
+    .speaking-card .dialogue-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      border-left: 3px solid rgba(79,172,254,0.2);
+      transition: all 0.2s ease;
+    }
+    .speaking-card .dialogue-line:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .speaking-card .dialogue-line .speaker {
+      font-weight: 700;
+      color: #f093fb;
+      min-width: 80px;
+      font-size: 0.95rem;
+    }
+    .speaking-card .dialogue-line .text {
+      flex: 1;
+      color: #d0c8e0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: color 0.4s ease;
+    }
+    .speaking-card .dialogue-line .listen-btn {
+      background: rgba(79,172,254,0.12);
+      border: none;
+      color: #4facfe;
+      font-size: 0.8rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .speaking-card .dialogue-line .listen-btn:hover {
+      background: rgba(79,172,254,0.25);
+      color: #43e97b;
+      transform: scale(1.05);
+    }
+    .speaking-card .conv-questions {
+      margin-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 16px;
+      transition: border-color 0.4s ease;
+    }
+    .speaking-card .conv-questions .q-item {
+      background: rgba(255,255,255,0.03);
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 8px;
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .speaking-card .conv-questions .q-item strong {
+      color: #f093fb;
+    }
+    .speaking-card .conv-questions .q-item .answer {
+      display: block;
+      margin-top: 4px;
+      color: #4facfe;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .speaking-card .conv-questions .q-item .answer.hidden {
+      display: none;
+    }
+    .show-answers-btn {
+      background: rgba(79,172,254,0.12);
+      border: 1px solid rgba(79,172,254,0.15);
+      padding: 6px 20px;
+      border-radius: 40px;
+      color: #4facfe;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    .show-answers-btn:hover { background: rgba(79,172,254,0.22); }
+
+    /* ===== CREDITS ===== */
+    .credits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .credit-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 24px;
+      padding: 24px 20px 28px;
+      border: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .credit-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255,255,255,0.10);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      background: rgba(255,255,255,0.08);
+    }
+    .credit-card .photo-placeholder {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #f093fb, #4facfe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      color: #fff;
+      box-shadow: 0 0 40px rgba(79,172,254,0.12);
+      transition: all 0.3s ease;
+      border: 3px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .credit-card:hover .photo-placeholder { transform: scale(1.04); }
+    .credit-card .photo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+    .credit-card .credit-name { font-size: 1.05rem; font-weight: 700; color: #fff; margin-top: 4px; transition: color 0.4s ease; }
+
+    /* ===== GAME MODAL ===== */
+    .game-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(21,16,42,0.94);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: background 0.4s ease;
+    }
+    .game-modal.open { display: flex; }
+    .modal-box {
+      background: #1f1840;
+      border-radius: 32px;
+      padding: 36px 32px;
+      max-width: 680px;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.7);
+      animation: modalIn 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+      transition: background 0.4s ease;
+    }
+    @keyframes modalIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-box .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .modal-box .modal-header h2 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .close-modal {
+      background: rgba(255,255,255,0.06);
+      border: none;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .close-modal:hover { background: rgba(245,87,108,0.2); transform: rotate(90deg); }
+    .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 18px; color: #fff; line-height: 1.6; transition: color 0.4s ease; }
+    .question-number { color: #a098b8; font-size: 0.85rem; margin-bottom: 4px; transition: color 0.4s ease; }
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .options button {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.08);
+      padding: 14px 20px;
+      border-radius: 16px;
+      color: #ddd;
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .options button:hover:not(:disabled) {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .options button.correct { background: rgba(67,233,123,0.15); border-color: #43e97b; color: #43e97b; }
+    .options button.wrong { background: rgba(245,87,108,0.15); border-color: #f5576c; color: #f5576c; }
+    .options button:disabled { cursor: default; opacity: 0.7; }
+    .feedback {
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-weight: 500;
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct { background: rgba(67,233,123,0.12); color: #43e97b; border: 1px solid rgba(67,233,123,0.15); }
+    .feedback.wrong { background: rgba(245,87,108,0.12); color: #f5576c; border: 1px solid rgba(245,87,108,0.15); }
+    .next-btn {
+      background: linear-gradient(135deg, #4facfe, #43e97b);
+      border: none;
+      padding: 12px 32px;
+      border-radius: 40px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+    }
+    .next-btn.show { display: inline-block; }
+    .next-btn:hover { transform: scale(1.04); box-shadow: 0 8px 32px rgba(79,172,254,0.3); }
+    .score-display { text-align: center; padding: 20px 0; }
+    .score-display .big-score {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .score-display p { color: #c8c0d8; font-size: 1.1rem; transition: color 0.4s ease; }
+    .restart-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      border: none;
+      padding: 12px 32px;
+      border-radius: 40px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+      margin-right: 8px;
+    }
+    .restart-btn:hover { transform: scale(1.04); box-shadow: 0 8px 32px rgba(245,87,108,0.3); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .navbar { padding: 8px 14px; flex-direction: column; align-items: stretch; gap: 6px; }
+      .navbar .brand { font-size: 1.2rem; justify-content: center; }
+      .navbar .brand img { height: 32px; }
+      .nav-links { justify-content: center; flex-wrap: wrap; }
+      .nav-links li button { padding: 5px 12px; font-size: 0.7rem; }
+      .navbar-controls { margin: 4px auto 0; }
+      .theme-toggle { width: 36px; height: 36px; font-size: 0.9rem; }
+      .page { top: 130px; padding: 20px 14px 30px; }
+      #welcome h1 { font-size: 3rem; }
+      #welcome .logo-wrap img { height: 170px; } /* Responsive más grande también */
+      .page-title { font-size: 2rem; }
+      .texts-grid { grid-template-columns: 1fr; }
+      .verbs-list { grid-template-columns: 1fr 1fr; }
+      .credits-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .games-grid { grid-template-columns: 1fr; }
+      .modal-box { padding: 24px 16px; }
+      .verbs-search input { width: 100%; }
+      .speaking-grid { padding: 0 10px; }
+      .speaking-card .dialogue-line { flex-wrap: wrap; }
+      .speaking-card .dialogue-line .speaker { min-width: 60px; }
+    }
+    @media (max-width: 480px) {
+      .verbs-list { grid-template-columns: 1fr; }
+      .vocab-grid { grid-template-columns: 1fr 1fr; }
+      #welcome .logo-wrap img { height: 140px; }
+    }
+
+    /* ===== PARTICLES ===== */
+    .bg-particles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .bg-particles span {
+      position: absolute;
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: rgba(79,172,254,0.05);
+      border-radius: 50%;
+      animation: floatUp 22s linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* ============================================================
+       LIGHT MODE OVERRIDES
+       ============================================================ */
+    body.light-mode {
+      background: #ede8f7;
+      color: #2a1f45;
+    }
+    body.light-mode ::-webkit-scrollbar-track {
+      background: #d8d0e8;
+    }
+    body.light-mode .navbar {
+      background: rgba(237, 232, 247, 0.9);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+    body.light-mode .nav-links li button {
+      background: rgba(0, 0, 0, 0.05);
+      color: #4a3f68;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .nav-links li button:hover {
+      background: rgba(0, 0, 0, 0.1);
+      color: #1a1030;
+    }
+    body.light-mode .lang-toggle {
+      background: rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    body.light-mode .lang-toggle button {
+      color: #5a4f78;
+    }
+    body.light-mode .lang-toggle button:hover:not(.active-lang) {
+      background: rgba(0, 0, 0, 0.08);
+      color: #1a1030;
+    }
+    body.light-mode .page {
+      background: radial-gradient(ellipse at 30% 20%, rgba(245, 87, 108, 0.06), transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(79, 172, 254, 0.06), transparent 60%),
+        #ede8f7;
+    }
+    body.light-mode #welcome {
+      background: radial-gradient(ellipse at 20% 30%, rgba(245, 87, 108, 0.08), transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(79, 172, 254, 0.08), transparent 50%),
+        #ede8f7;
+    }
+    body.light-mode .page-subtitle { color: #5a4f78; }
+    body.light-mode #welcome .intro-text { color: #3a2f58; }
+    body.light-mode #welcome .objective {
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    body.light-mode #welcome .objective p { color: #3a2f58; }
+    body.light-mode .welcome-badge .badge-item {
+      background: rgba(255, 255, 255, 0.65);
+      color: #3a2f58;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .welcome-badge .badge-item:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    body.light-mode .game-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .game-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    body.light-mode .game-card h3 { color: #1a1030; }
+    body.light-mode .game-card p { color: #5a4f78; }
+    body.light-mode .question-count { color: #7a6f98; }
+    body.light-mode .verb-item {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .verb-item:hover { background: rgba(255, 255, 255, 0.9); }
+    body.light-mode .verb-row .verb-form-label { color: #6a5f88; }
+    body.light-mode .verb-row .verb-form-value { color: #2a1f45; }
+    body.light-mode .verb-es { color: #5a4f78; }
+    body.light-mode .verbs-stats { color: #7a6f98; }
+    body.light-mode .verbs-tabs button {
+      background: rgba(0, 0, 0, 0.04);
+      color: #4a3f68;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .verbs-tabs button:hover { background: rgba(0, 0, 0, 0.08); }
+    body.light-mode .verbs-search input,
+    body.light-mode .vocab-search input {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: #2a1f45;
+    }
+    body.light-mode .verbs-search input::placeholder,
+    body.light-mode .vocab-search input::placeholder { color: #8a80a0; }
+    body.light-mode .text-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .text-card:hover { background: rgba(255, 255, 255, 0.9); }
+    body.light-mode .text-card .text-title { color: #1a1030; }
+    body.light-mode .text-card .text-body {
+      color: #3a2f58;
+      background: rgba(0, 0, 0, 0.025);
+    }
+    body.light-mode .text-card .text-questions .q-item {
+      background: rgba(0, 0, 0, 0.025);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    body.light-mode .vocab-item {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .vocab-item:hover { background: rgba(255, 255, 255, 0.9); }
+    body.light-mode .vocab-item .vocab-word { color: #1a1030; }
+    body.light-mode .vocab-item .vocab-meaning { color: #5a4f78; }
+    body.light-mode .vocab-count { color: #7a6f98; }
+    body.light-mode .speaking-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .speaking-card:hover { background: rgba(255, 255, 255, 0.9); }
+    body.light-mode .speaking-card .conv-title { color: #1a1030; }
+    body.light-mode .dialogue-line { background: rgba(0, 0, 0, 0.025); }
+    body.light-mode .dialogue-line:hover { background: rgba(0, 0, 0, 0.05); }
+    body.light-mode .dialogue-line .text { color: #3a2f58; }
+    body.light-mode .speaking-card .conv-questions { border-top-color: rgba(0, 0, 0, 0.06); }
+    body.light-mode .conv-questions .q-item {
+      background: rgba(0, 0, 0, 0.025);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    body.light-mode .credit-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .credit-card:hover { background: rgba(255, 255, 255, 0.9); }
+    body.light-mode .credit-card .credit-name { color: #1a1030; }
+    body.light-mode .credit-card .photo-placeholder {
+      border: 3px solid rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .game-modal { background: rgba(237, 232, 247, 0.94); }
+    body.light-mode .modal-box {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+    body.light-mode .question-text { color: #1a1030; }
+    body.light-mode .question-number { color: #7a6f98; }
+    body.light-mode .options button {
+      background: rgba(0, 0, 0, 0.03);
+      border: 2px solid rgba(0, 0, 0, 0.06);
+      color: #3a2f58;
+    }
+    body.light-mode .options button:hover:not(:disabled) {
+      background: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    body.light-mode .close-modal { background: rgba(0, 0, 0, 0.05); color: #1a1030; }
+    body.light-mode .score-display p { color: #5a4f78; }
+    body.light-mode .bg-particles span { background: rgba(79, 172, 254, 0.08); }
+    body.light-mode .navbar .brand img {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    /* ===== OFFLINE AUDIO INDICATOR ===== */
+    .audio-playing .fa-volume-up {
+      animation: pulse 0.8s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== PARTICLES ===== -->
+  <div class="bg-particles" id="particles"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="brand">
+      <img src="logoColor.png" alt="Presenteasy" onerror="this.style.display='none'" />
+      <span>Presenteasy</span>
+    </div>
+    <ul class="nav-links">
+      <li><button class="active" data-page="welcome"><i class="fas fa-home"></i> Home</button></li>
+      <li><button data-page="verbs"><i class="fas fa-book"></i> Verbs</button></li>
+      <li><button data-page="vocab"><i class="fas fa-graduation-cap"></i> Vocab</button></li>
+      <li><button data-page="texts"><i class="fas fa-file-alt"></i> Texts</button></li>
+      <li><button data-page="games"><i class="fas fa-gamepad"></i> Games</button></li>
+      <li><button data-page="speaking"><i class="fas fa-microphone-alt"></i> Speaking</button></li>
+      <li><button data-page="credits"><i class="fas fa-users"></i> Credits</button></li>
+    </ul>
+    <div class="navbar-controls">
+      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <div class="lang-toggle">
+        <button id="langEn" class="active-lang" data-lang="en">EN</button>
+        <button id="langEs" data-lang="es">ES</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================================================================
+  PAGE: WELCOME
+  ================================================================ -->
+  <section id="welcome" class="page active">
+    <div class="logo-wrap">
+      <img src="MascotaPE.png" alt="Presenteasy" onerror="this.style.display='none'" />
+    </div>
+    <h1>Presenteasy</h1>
+    <div class="intro-text" id="welcomeIntro">
+      <strong>Welcome to Presenteasy</strong> — your ultimate interactive English learning hub! Here, you can master <strong>vocabulary</strong>, <strong>grammar</strong>, and <strong>reading</strong> through fun and engaging games, comprehensive verb lists, short reading passages with comprehension questions, and a rich glossary of 100 essential words. Whether you are a beginner or an expert, Presenteasy adapts to your level and makes learning English an exciting journey.
+    </div>
+    <div class="objective" id="welcomeObjective">
+      <p><i class="fas fa-bullseye"></i> <strong>Our goal:</strong> Make English learning
+        <strong>fun</strong>, <strong>colorful</strong>, and <strong>accessible</strong> for everyone.
+        Explore, play, and improve every day!
+      </p>
+    </div>
+    <div class="welcome-badge">
+      <span class="badge-item"><i class="fas fa-gamepad"></i> <span id="badgeGames">5 Games</span></span>
+      <span class="badge-item"><i class="fas fa-list"></i> <span id="badgeVerbs">100+ Verbs</span></span>
+      <span class="badge-item"><i class="fas fa-file-alt"></i> <span id="badgeTexts">4 Texts</span></span>
+      <span class="badge-item"><i class="fas fa-graduation-cap"></i> <span id="badgeVocab">100 Words</span></span>
+      <span class="badge-item"><i class="fas fa-microphone-alt"></i> <span id="badgeSpeaking">3 Conversations</span></span>
+      <span class="badge-item"><i class="fas fa-users"></i> <span id="badgeCredits">7 Creators</span></span>
+    </div>
+    <button class="glow-btn" onclick="navigateTo('games')">
+      <i class="fas fa-rocket"></i> <span id="startBtnText">Start Learning</span>
+    </button>
+  </section>
+
+  <!-- ================================================================
+  PAGE: VERBS
+  ================================================================ -->
+  <section id="verbs" class="page">
+    <h2 class="page-title"><i class="fas fa-book" style="color:#4facfe;"></i> Verbs</h2>
+    <p class="page-subtitle">Regular & irregular verbs with infinitive, past, past participle, and Spanish meaning.</p>
+    <div class="verbs-container">
+      <div class="verbs-tabs">
+        <button class="active" data-verb-type="all">🌐 All</button>
+        <button data-verb-type="regular">✅ Regular</button>
+        <button data-verb-type="irregular">⚡ Irregular</button>
+      </div>
+      <div class="verbs-search">
+        <input type="text" id="verbSearch" placeholder="🔍 Search verb or meaning..." />
+      </div>
+      <div class="verbs-stats" id="verbsStats"></div>
+      <div class="verbs-list" id="verbsList"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+  PAGE: VOCAB
+  ================================================================ -->
+  <section id="vocab" class="page">
+    <h2 class="page-title"><i class="fas fa-graduation-cap" style="color:#fbbf24;"></i> Vocabulary</h2>
+    <p class="page-subtitle">100 essential English words with meanings and tags. Search and discover!</p>
+    <div class="vocab-container">
+      <div class="vocab-search">
+        <input type="text" id="vocabSearch" placeholder="🔍 Search a word..." />
+      </div>
+      <div class="vocab-count" id="vocabCount"></div>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+  PAGE: TEXTS
+  ================================================================ -->
+  <section id="texts" class="page">
+    <h2 class="page-title" id="textsTitle"><i class="fas fa-file-alt" style="color:#43e97b;"></i> Texts</h2>
+    <p class="page-subtitle" id="textsSub">Read short passages and answer 3 simple questions to test your comprehension.</p>
+    <div class="texts-grid" id="textsGrid"></div>
+  </section>
+
+  <!-- ================================================================
+  PAGE: GAMES
+  ================================================================ -->
+  <section id="games" class="page">
+    <h2 class="page-title" id="gamesTitle"><i class="fas fa-gamepad" style="color:#f093fb;"></i> Games</h2>
+    <p class="page-subtitle" id="gamesSub">Choose a game, answer questions, and earn your score. Each level is a new challenge!</p>
+    <div class="games-grid" id="gamesGrid"></div>
+  </section>
+
+  <!-- ================================================================
+  PAGE: SPEAKING
+  ================================================================ -->
+  <section id="speaking" class="page">
+    <h2 class="page-title" id="speakingTitle"><i class="fas fa-microphone-alt" style="color:#f093fb;"></i> Speaking</h2>
+    <p class="page-subtitle" id="speakingSub">Listen to each line of the conversations. Practice your listening and pronunciation!</p>
+    <div class="speaking-grid" id="speakingGrid"></div>
+  </section>
+
+  <!-- ================================================================
+  PAGE: CREDITS
+  ================================================================ -->
+  <section id="credits" class="page">
+    <h2 class="page-title"><i class="fas fa-users" style="color:#f093fb;"></i> Credits</h2>
+    <p class="page-subtitle">Meet the amazing team behind Presenteasy.</p>
+    <div class="credits-grid" id="creditsGrid"></div>
+  </section>
+
+  <!-- ================================================================
+  GAME MODAL
+  ================================================================ -->
+  <div class="game-modal" id="gameModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modalTitle">Game</h2>
+        <button class="close-modal" id="closeModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // ================================================================
+    // DATA
+    // ================================================================
+
+    const irregularMap = {
+      'be': { past: 'was/were', pastParticiple: 'been' },
+      'begin': { past: 'began', pastParticiple: 'begun' },
+      'break': { past: 'broke', pastParticiple: 'broken' },
+      'bring': { past: 'brought', pastParticiple: 'brought' },
+      'build': { past: 'built', pastParticiple: 'built' },
+      'buy': { past: 'bought', pastParticiple: 'bought' },
+      'choose': { past: 'chose', pastParticiple: 'chosen' },
+      'come': { past: 'came', pastParticiple: 'come' },
+      'cost': { past: 'cost', pastParticiple: 'cost' },
+      'cut': { past: 'cut', pastParticiple: 'cut' },
+      'do': { past: 'did', pastParticiple: 'done' },
+      'draw': { past: 'drew', pastParticiple: 'drawn' },
+      'drink': { past: 'drank', pastParticiple: 'drunk' },
+      'drive': { past: 'drove', pastParticiple: 'driven' },
+      'eat': { past: 'ate', pastParticiple: 'eaten' },
+      'fall': { past: 'fell', pastParticiple: 'fallen' },
+      'feel': { past: 'felt', pastParticiple: 'felt' },
+      'find': { past: 'found', pastParticiple: 'found' },
+      'fly': { past: 'flew', pastParticiple: 'flown' },
+      'forget': { past: 'forgot', pastParticiple: 'forgotten' },
+      'get': { past: 'got', pastParticiple: 'gotten' },
+      'give': { past: 'gave', pastParticiple: 'given' },
+      'go': { past: 'went', pastParticiple: 'gone' },
+      'grow': { past: 'grew', pastParticiple: 'grown' },
+      'have': { past: 'had', pastParticiple: 'had' },
+      'hear': { past: 'heard', pastParticiple: 'heard' },
+      'hide': { past: 'hid', pastParticiple: 'hidden' },
+      'hit': { past: 'hit', pastParticiple: 'hit' },
+      'hold': { past: 'held', pastParticiple: 'held' },
+      'keep': { past: 'kept', pastParticiple: 'kept' },
+      'know': { past: 'knew', pastParticiple: 'known' },
+      'leave': { past: 'left', pastParticiple: 'left' },
+      'lend': { past: 'lent', pastParticiple: 'lent' },
+      'let': { past: 'let', pastParticiple: 'let' },
+      'lose': { past: 'lost', pastParticiple: 'lost' },
+      'make': { past: 'made', pastParticiple: 'made' },
+      'mean': { past: 'meant', pastParticiple: 'meant' },
+      'meet': { past: 'met', pastParticiple: 'met' },
+      'pay': { past: 'paid', pastParticiple: 'paid' },
+      'put': { past: 'put', pastParticiple: 'put' },
+      'read': { past: 'read', pastParticiple: 'read' },
+      'ride': { past: 'rode', pastParticiple: 'ridden' },
+      'ring': { past: 'rang', pastParticiple: 'rung' },
+      'run': { past: 'ran', pastParticiple: 'run' },
+      'say': { past: 'said', pastParticiple: 'said' },
+      'see': { past: 'saw', pastParticiple: 'seen' },
+      'sell': { past: 'sold', pastParticiple: 'sold' },
+      'send': { past: 'sent', pastParticiple: 'sent' },
+      'set': { past: 'set', pastParticiple: 'set' },
+      'shake': { past: 'shook', pastParticiple: 'shaken' }
+    };
+
+    function getVerbForms(en, type) {
+      if (type === 'irregular' && irregularMap[en.toLowerCase()]) {
+        const irr = irregularMap[en.toLowerCase()];
+        return { past: irr.past, pastParticiple: irr.pastParticiple };
+      }
+      let base = en.toLowerCase();
+      let past, pastParticiple;
+      if (base.endsWith('e')) {
+        past = base + 'd';
+        pastParticiple = base + 'd';
+      } else if (base.endsWith('y') && !['a','e','i','o','u'].includes(base[base.length-2])) {
+        past = base.slice(0, -1) + 'ied';
+        pastParticiple = base.slice(0, -1) + 'ied';
+      } else if (base.length === 1) {
+        past = base + base + 'ed';
+        pastParticiple = base + base + 'ed';
+      } else if (base.match(/[aeiou][bcdfghjklmnpqrstvwxyz]$/) && base.length > 2 && !base.endsWith('w') && !base.endsWith('x') && !base.endsWith('y')) {
+        const last = base[base.length-1];
+        past = base + last + 'ed';
+        pastParticiple = base + last + 'ed';
+      } else {
+        past = base + 'ed';
+        pastParticiple = base + 'ed';
+      }
+      if (en[0] === en[0].toUpperCase()) {
+        past = past.charAt(0).toUpperCase() + past.slice(1);
+        pastParticiple = pastParticiple.charAt(0).toUpperCase() + pastParticiple.slice(1);
+      }
+      return { past, pastParticiple };
+    }
+
+    const baseVerbs = [
+      { en: 'Accept', es: 'Aceptar', type: 'regular' },
+      { en: 'Add', es: 'Añadir', type: 'regular' },
+      { en: 'Admit', es: 'Admitir', type: 'regular' },
+      { en: 'Afford', es: 'Permitirse', type: 'regular' },
+      { en: 'Agree', es: 'Acordar', type: 'regular' },
+      { en: 'Allow', es: 'Permitir', type: 'regular' },
+      { en: 'Answer', es: 'Responder', type: 'regular' },
+      { en: 'Appear', es: 'Aparecer', type: 'regular' },
+      { en: 'Arrange', es: 'Arreglar', type: 'regular' },
+      { en: 'Arrive', es: 'Llegar', type: 'regular' },
+      { en: 'Ask', es: 'Preguntar', type: 'regular' },
+      { en: 'Attack', es: 'Atacar', type: 'regular' },
+      { en: 'Avoid', es: 'Evitar', type: 'regular' },
+      { en: 'Bake', es: 'Hornear', type: 'regular' },
+      { en: 'Bathe', es: 'Bañarse', type: 'regular' },
+      { en: 'Behave', es: 'Comportarse', type: 'regular' },
+      { en: 'Believe', es: 'Creer', type: 'regular' },
+      { en: 'Borrow', es: 'Pedir prestado', type: 'regular' },
+      { en: 'Breathe', es: 'Respirar', type: 'regular' },
+      { en: 'Call', es: 'Llamar', type: 'regular' },
+      { en: 'Cancel', es: 'Cancelar', type: 'regular' },
+      { en: 'Carry', es: 'Llevar', type: 'regular' },
+      { en: 'Change', es: 'Cambiar', type: 'regular' },
+      { en: 'Cheat', es: 'Engañar', type: 'regular' },
+      { en: 'Clean', es: 'Limpiar', type: 'regular' },
+      { en: 'Climb', es: 'Escalar', type: 'regular' },
+      { en: 'Close', es: 'Cerrar', type: 'regular' },
+      { en: 'Collect', es: 'Recolectar', type: 'regular' },
+      { en: 'Compare', es: 'Comparar', type: 'regular' },
+      { en: 'Complain', es: 'Quejarse', type: 'regular' },
+      { en: 'Complete', es: 'Completar', type: 'regular' },
+      { en: 'Consider', es: 'Considerar', type: 'regular' },
+      { en: 'Continue', es: 'Continuar', type: 'regular' },
+      { en: 'Control', es: 'Controlar', type: 'regular' },
+      { en: 'Cook', es: 'Cocinar', type: 'regular' },
+      { en: 'Copy', es: 'Copiar', type: 'regular' },
+      { en: 'Count', es: 'Contar', type: 'regular' },
+      { en: 'Create', es: 'Crear', type: 'regular' },
+      { en: 'Cry', es: 'Llorar', type: 'regular' },
+      { en: 'Dance', es: 'Bailar', type: 'regular' },
+      { en: 'Decide', es: 'Decidir', type: 'regular' },
+      { en: 'Deliver', es: 'Entregar', type: 'regular' },
+      { en: 'Demand', es: 'Exigir', type: 'regular' },
+      { en: 'Deny', es: 'Negar', type: 'regular' },
+      { en: 'Describe', es: 'Describir', type: 'regular' },
+      { en: 'Deserve', es: 'Merecer', type: 'regular' },
+      { en: 'Destroy', es: 'Destruir', type: 'regular' },
+      { en: 'Develop', es: 'Desarrollar', type: 'regular' },
+      { en: 'Disagree', es: 'Desacordar', type: 'regular' },
+      { en: 'Discover', es: 'Descubrir', type: 'regular' },
+      { en: 'Divide', es: 'Dividir', type: 'regular' },
+      { en: 'Be', es: 'Ser / Estar', type: 'irregular' },
+      { en: 'Begin', es: 'Comenzar', type: 'irregular' },
+      { en: 'Break', es: 'Romper', type: 'irregular' },
+      { en: 'Bring', es: 'Traer', type: 'irregular' },
+      { en: 'Build', es: 'Construir', type: 'irregular' },
+      { en: 'Buy', es: 'Comprar', type: 'irregular' },
+      { en: 'Choose', es: 'Elegir', type: 'irregular' },
+      { en: 'Come', es: 'Venir', type: 'irregular' },
+      { en: 'Cost', es: 'Costar', type: 'irregular' },
+      { en: 'Cut', es: 'Cortar', type: 'irregular' },
+      { en: 'Do', es: 'Hacer', type: 'irregular' },
+      { en: 'Draw', es: 'Dibujar', type: 'irregular' },
+      { en: 'Drink', es: 'Beber', type: 'irregular' },
+      { en: 'Drive', es: 'Conducir', type: 'irregular' },
+      { en: 'Eat', es: 'Comer', type: 'irregular' },
+      { en: 'Fall', es: 'Caer', type: 'irregular' },
+      { en: 'Feel', es: 'Sentir', type: 'irregular' },
+      { en: 'Find', es: 'Encontrar', type: 'irregular' },
+      { en: 'Fly', es: 'Volar', type: 'irregular' },
+      { en: 'Forget', es: 'Olvidar', type: 'irregular' },
+      { en: 'Get', es: 'Obtener', type: 'irregular' },
+      { en: 'Give', es: 'Dar', type: 'irregular' },
+      { en: 'Go', es: 'Ir', type: 'irregular' },
+      { en: 'Grow', es: 'Crecer', type: 'irregular' },
+      { en: 'Have', es: 'Tener', type: 'irregular' },
+      { en: 'Hear', es: 'Oír', type: 'irregular' },
+      { en: 'Hide', es: 'Esconder', type: 'irregular' },
+      { en: 'Hit', es: 'Golpear', type: 'irregular' },
+      { en: 'Hold', es: 'Sostener', type: 'irregular' },
+      { en: 'Keep', es: 'Mantener', type: 'irregular' },
+      { en: 'Know', es: 'Saber', type: 'irregular' },
+      { en: 'Leave', es: 'Dejar', type: 'irregular' },
+      { en: 'Lend', es: 'Prestar', type: 'irregular' },
+      { en: 'Let', es: 'Permitir', type: 'irregular' },
+      { en: 'Lose', es: 'Perder', type: 'irregular' },
+      { en: 'Make', es: 'Hacer', type: 'irregular' },
+      { en: 'Mean', es: 'Significar', type: 'irregular' },
+      { en: 'Meet', es: 'Encontrarse', type: 'irregular' },
+      { en: 'Pay', es: 'Pagar', type: 'irregular' },
+      { en: 'Put', es: 'Poner', type: 'irregular' },
+      { en: 'Read', es: 'Leer', type: 'irregular' },
+      { en: 'Ride', es: 'Montar', type: 'irregular' },
+      { en: 'Ring', es: 'Sonar', type: 'irregular' },
+      { en: 'Run', es: 'Correr', type: 'irregular' },
+      { en: 'Say', es: 'Decir', type: 'irregular' },
+      { en: 'See', es: 'Ver', type: 'irregular' },
+      { en: 'Sell', es: 'Vender', type: 'irregular' },
+      { en: 'Send', es: 'Enviar', type: 'irregular' },
+      { en: 'Set', es: 'Poner / Colocar', type: 'irregular' },
+      { en: 'Shake', es: 'Agitar', type: 'irregular' }
+    ];
+
+    const verbsData = baseVerbs.map(v => {
+      const forms = getVerbForms(v.en, v.type);
+      return {
+        infinitive: v.en,
+        past: forms.past,
+        pastParticiple: forms.pastParticiple,
+        spanish: v.es,
+        type: v.type
+      };
+    });
+
+    const gamesData = [{
+      id: 0,
+      difficulty: 'easy',
+      titleEn: '🎯 Basic Vocabulary',
+      titleEs: '🎯 Vocabulario Básico',
+      descEn: 'Match English words with their Spanish meaning.',
+      descEs: 'Relaciona palabras en inglés con su significado en español.',
+      questionsEn: [
+        { q: 'What does "Hello" mean?', options: ['Adiós', 'Hola', 'Gracias', 'Por favor'], answer: 1 },
+        { q: 'What does "Book" mean?', options: ['Cuaderno', 'Libro', 'Lápiz', 'Mesa'], answer: 1 },
+        { q: 'What does "Cat" mean?', options: ['Perro', 'Gato', 'Pájaro', 'Pez'], answer: 1 },
+        { q: 'What does "House" mean?', options: ['Casa', 'Jardín', 'Coche', 'Puerta'], answer: 0 },
+        { q: 'What does "Happy" mean?', options: ['Triste', 'Feliz', 'Enojado', 'Cansado'], answer: 1 }
+      ],
+      questionsEs: [
+        { q: '¿Qué significa "Hello"?', options: ['Adiós', 'Hola', 'Gracias', 'Por favor'], answer: 1 },
+        { q: '¿Qué significa "Book"?', options: ['Cuaderno', 'Libro', 'Lápiz', 'Mesa'], answer: 1 },
+        { q: '¿Qué significa "Cat"?', options: ['Perro', 'Gato', 'Pájaro', 'Pez'], answer: 1 },
+        { q: '¿Qué significa "House"?', options: ['Casa', 'Jardín', 'Coche', 'Puerta'], answer: 0 },
+        { q: '¿Qué significa "Happy"?', options: ['Triste', 'Feliz', 'Enojado', 'Cansado'], answer: 1 }
+      ]
+    }, {
+      id: 1,
+      difficulty: 'medium',
+      titleEn: '🧩 Simple Grammar',
+      titleEs: '🧩 Gramática Simple',
+      descEn: 'Choose the correct option to complete each sentence.',
+      descEs: 'Elige la opción correcta para completar cada oración.',
+      questionsEn: [
+        { q: 'She ___ to school every day.', options: ['go', 'goes', 'going', 'went'], answer: 1 },
+        { q: 'They ___ playing football now.', options: ['is', 'am', 'are', 'be'], answer: 2 },
+        { q: 'I ___ a student.', options: ['is', 'am', 'are', 'be'], answer: 1 },
+        { q: 'We ___ to the park yesterday.', options: ['go', 'goes', 'went', 'going'], answer: 2 },
+        { q: 'He ___ a new car.', options: ['has', 'have', 'is', 'are'], answer: 0 }
+      ],
+      questionsEs: [
+        { q: 'Ella ___ a la escuela todos los días.', options: ['va', 'voy', 'vamos', 'van'], answer: 0 },
+        { q: 'Ellos ___ jugando fútbol ahora.', options: ['es', 'soy', 'están', 'son'], answer: 2 },
+        { q: 'Yo ___ un estudiante.', options: ['soy', 'eres', 'es', 'somos'], answer: 0 },
+        { q: 'Nosotros ___ al parque ayer.', options: ['fuimos', 'vamos', 'ir', 'fue'], answer: 0 },
+        { q: 'Él ___ un coche nuevo.', options: ['tiene', 'tengo', 'tenemos', 'tienen'], answer: 0 }
+      ]
+    }, {
+      id: 2,
+      difficulty: 'medium-hard',
+      titleEn: '⏳ Verb Tenses',
+      titleEs: '⏳ Tiempos Verbales',
+      descEn: 'Identify the correct verb tense in each sentence.',
+      descEs: 'Identifica el tiempo verbal correcto en cada oración.',
+      questionsEn: [
+        { q: 'I ___ (eat) breakfast every morning.', options: ['eat', 'eats', 'eating', 'ate'], answer: 0 },
+        { q: 'She ___ (write) a letter right now.', options: ['write', 'writes', 'is writing', 'wrote'], answer: 2 },
+        { q: 'They ___ (visit) their grandparents last weekend.', options: ['visit', 'visits', 'visited', 'visiting'], answer: 2 },
+        { q: 'We ___ (study) for the exam tomorrow.', options: ['study', 'studies', 'studied', 'will study'], answer: 3 },
+        { q: 'He ___ (play) the guitar since he was 10.', options: ['play', 'plays', 'has played', 'is playing'], answer: 2 }
+      ],
+      questionsEs: [
+        { q: 'Yo ___ (desayunar) todas las mañanas.', options: ['desayuno', 'desayunas', 'desayuna', 'desayunan'], answer: 0 },
+        { q: 'Ella ___ (escribir) una carta ahora mismo.', options: ['escribe', 'escribo', 'está escribiendo', 'escribió'], answer: 2 },
+        { q: 'Ellos ___ (visitar) a sus abuelos el fin de semana pasado.', options: ['visitan', 'visitaron', 'visitar', 'visitarán'], answer: 1 },
+        { q: 'Nosotros ___ (estudiar) para el examen mañana.', options: ['estudiamos', 'estudiaremos', 'estudiamos', 'estudiar'], answer: 1 },
+        { q: 'Él ___ (tocar) la guitarra desde que tenía 10 años.', options: ['toca', 'tocó', 'ha tocado', 'está tocando'], answer: 2 }
+      ]
+    }, {
+      id: 3,
+      difficulty: 'hard',
+      titleEn: '🧠 Advanced Vocab',
+      titleEs: '🧠 Vocabulario Avanzado',
+      descEn: 'More complex words to expand your lexicon.',
+      descEs: 'Palabras más complejas para ampliar tu léxico.',
+      questionsEn: [
+        { q: 'What does "Benevolent" mean?', options: ['Malvado', 'Bondadoso', 'Rápido', 'Triste'], answer: 1 },
+        { q: 'What does "Audacious" mean?', options: ['Audaz', 'Tímido', 'Aburrido', 'Dulce'], answer: 0 },
+        { q: 'What does "Meticulous" mean?', options: ['Descuidado', 'Meticuloso', 'Perezoso', 'Feliz'], answer: 1 },
+        { q: 'What does "Profound" mean?', options: ['Superficial', 'Profundo', 'Ligero', 'Débil'], answer: 1 },
+        { q: 'What does "Resilient" mean?', options: ['Frágil', 'Resistente', 'Triste', 'Lento'], answer: 1 }
+      ],
+      questionsEs: [
+        { q: '¿Qué significa "Benevolent"?', options: ['Malvado', 'Bondadoso', 'Rápido', 'Triste'], answer: 1 },
+        { q: '¿Qué significa "Audacious"?', options: ['Audaz', 'Tímido', 'Aburrido', 'Dulce'], answer: 0 },
+        { q: '¿Qué significa "Meticulous"?', options: ['Descuidado', 'Meticuloso', 'Perezoso', 'Feliz'], answer: 1 },
+        { q: '¿Qué significa "Profound"?', options: ['Superficial', 'Profundo', 'Ligero', 'Débil'], answer: 1 },
+        { q: '¿Qué significa "Resilient"?', options: ['Frágil', 'Resistente', 'Triste', 'Lento'], answer: 1 }
+      ]
+    }, {
+      id: 4,
+      difficulty: 'expert',
+      titleEn: '🏆 Expert Challenge',
+      titleEs: '🏆 Reto Experto',
+      descEn: 'Mixed grammar, vocab, and comprehension questions.',
+      descEs: 'Preguntas mixtas de gramática, vocabulario y comprensión.',
+      questionsEn: [
+        { q: 'Which sentence is correct?', options: ['He don\'t like it.', 'He doesn\'t like it.', 'He not like it.', 'He no like it.'], answer: 1 },
+        { q: 'What is the past of "go"?', options: ['goed', 'went', 'gone', 'going'], answer: 1 },
+        { q: 'What does "Ephemeral" mean?', options: ['Eterno', 'Efímero', 'Grandioso', 'Pequeño'], answer: 1 },
+        { q: 'She ___ (finish) her homework already.', options: ['finish', 'finishes', 'has finished', 'is finishing'], answer: 2 },
+        { q: 'Choose the correct synonym of "Brave".', options: ['Cobarde', 'Valiente', 'Débil', 'Tímido'], answer: 1 }
+      ],
+      questionsEs: [
+        { q: '¿Cuál oración es correcta?', options: ['Él no gusta.', 'A él no le gusta.', 'Él no gustar.', 'Él gusta no.'], answer: 1 },
+        { q: '¿Cuál es el pasado de "go"?', options: ['goed', 'went', 'gone', 'going'], answer: 1 },
+        { q: '¿Qué significa "Ephemeral"?', options: ['Eterno', 'Efímero', 'Grandioso', 'Pequeño'], answer: 1 },
+        { q: 'Ella ya ___ (terminar) su tarea.', options: ['termina', 'terminó', 'ha terminado', 'está terminando'], answer: 2 },
+        { q: 'Elige el sinónimo correcto de "Brave".', options: ['Cobarde', 'Valiente', 'Débil', 'Tímido'], answer: 1 }
+      ]
+    }];
+
+    const textsData = [{
+      titleEn: '☀️ My Day',
+      titleEs: '☀️ Mi Día',
+      bodyEn: 'Every morning, I wake up at 7:00. I have fruit and cereal for breakfast, then brush my teeth and get dressed. I leave home at 8:00 and walk to school. My classes start at 8:30. I love English class because we learn new words and play games. In the afternoon, I have lunch with my friends and then go back home. In the evening, I do homework and watch TV before sleeping.',
+      bodyEs: 'Cada mañana, me despierto a las 7:00. Desayuno frutas y cereal, luego me cepillo los dientes y me visto. Salgo de casa a las 8:00 y camino a la escuela. Mis clases comienzan a las 8:30. Me encanta la clase de inglés porque aprendemos palabras nuevas y jugamos juegos. En la tarde, como con mis amigos y luego regreso a casa. Por la noche, hago tarea y veo televisión antes de dormir.',
+      questionsEn: [
+        { q: 'What time does the person wake up?', a: 'At 7:00' },
+        { q: 'What class do they love and why?', a: 'English, because they learn new words and play games' },
+        { q: 'What do they do in the evening?', a: 'Do homework and watch TV' }
+      ],
+      questionsEs: [
+        { q: '¿A qué hora se despierta la persona?', a: 'A las 7:00' },
+        { q: '¿Qué clase le encanta y por qué?', a: 'Inglés, porque aprenden palabras nuevas y juegan' },
+        { q: '¿Qué hace por la noche?', a: 'Hace tarea y ve televisión' }
+      ]
+    }, {
+      titleEn: '🐾 My Pet',
+      titleEs: '🐾 Mi Mascota',
+      bodyEn: 'I have a dog named Max. He is a golden Labrador, very playful and affectionate. Max sleeps in my room and every morning he wakes me up by licking my face. He loves to run in the park and catch the ball. When I come home from school, Max is always waiting at the door with his tail wagging happily. He is my best friend.',
+      bodyEs: 'Tengo un perro llamado Max. Es un labrador color dorado, muy juguetón y cariñoso. Max duerme en mi habitación y cada mañana me despierta lamiéndome la cara. Le gusta correr en el parque y atrapar la pelota. Cuando llego de la escuela, Max siempre está esperándome en la puerta con su cola moviéndose feliz. Es mi mejor amigo.',
+      questionsEn: [
+        { q: 'What is the dog\'s name and color?', a: 'Max, he is golden' },
+        { q: 'What does Max like to do in the park?', a: 'Run and catch the ball' },
+        { q: 'What does Max do when the owner comes home?', a: 'Wait at the door wagging his tail' }
+      ],
+      questionsEs: [
+        { q: '¿Cómo se llama el perro y de qué color es?', a: 'Max, es color dorado' },
+        { q: '¿Qué le gusta hacer a Max en el parque?', a: 'Correr y atrapar la pelota' },
+        { q: '¿Qué hace Max cuando llega de la escuela?', a: 'Lo espera en la puerta moviendo la cola' }
+      ]
+    }, {
+      titleEn: '✈️ An Unforgettable Trip',
+      titleEs: '✈️ Un Viaje Inolvidable',
+      bodyEn: 'Last summer I went to the beach with my family. We travelled by car for four hours. When we arrived, the sea was blue and the sky was clear. We built sandcastles, swam, and ate ice cream. In the afternoon, we watched the sunset together. It was a perfect day. We took many photos to remember it.',
+      bodyEs: 'El verano pasado fui a la playa con mi familia. Viajamos en coche durante cuatro horas. Cuando llegamos, el mar era azul y el cielo estaba despejado. Construimos castillos de arena, nadamos y comimos helado. Por la tarde, vimos el atardecer juntos. Fue un día perfecto. Tomamos muchas fotos para recordarlo.',
+      questionsEn: [
+        { q: 'How did they travel to the beach?', a: 'By car for four hours' },
+        { q: 'What activities did they do at the beach?', a: 'Built sandcastles, swam, and ate ice cream' },
+        { q: 'What did they watch in the afternoon?', a: 'The sunset' }
+      ],
+      questionsEs: [
+        { q: '¿Cómo viajaron a la playa?', a: 'En coche durante cuatro horas' },
+        { q: '¿Qué actividades hicieron en la playa?', a: 'Construyeron castillos de arena, nadaron y comieron helado' },
+        { q: '¿Qué vieron por la tarde?', a: 'El atardecer' }
+      ]
+    }, {
+      titleEn: '📚 The Power of Reading',
+      titleEs: '📚 El Poder de la Lectura',
+      bodyEn: 'Reading is one of the most enriching activities. When we read, we travel to other worlds, meet fascinating characters, and learn new things. Reading improves our vocabulary and helps us express ourselves better. It also reduces stress and makes us more empathetic. Reading at least 20 minutes a day can change our life.',
+      bodyEs: 'Leer es una de las actividades más enriquecedoras. Cuando leemos, viajamos a otros mundos, conocemos personajes fascinantes y aprendemos cosas nuevas. La lectura mejora nuestro vocabulario y nos ayuda a expresarnos mejor. Además, reduce el estrés y nos hace más empáticos. Leer al menos 20 minutos al día puede cambiar nuestra vida.',
+      questionsEn: [
+        { q: 'What does reading improve according to the text?', a: 'Vocabulary and expression' },
+        { q: 'How much time does the text recommend reading daily?', a: 'At least 20 minutes' },
+        { q: 'What other benefits does reading have?', a: 'Reduces stress and makes us more empathetic' }
+      ],
+      questionsEs: [
+        { q: '¿Qué mejora la lectura según el texto?', a: 'El vocabulario y la expresión' },
+        { q: '¿Cuánto tiempo al día recomienda el texto leer?', a: 'Al menos 20 minutos' },
+        { q: '¿Qué otros beneficios menciona la lectura?', a: 'Reduce el estrés y nos hace más empáticos' }
+      ]
+    }];
+
+    const vocabData = [
+      { word: 'Able', meaning: 'Capaz', tag: 'adj' },
+      { word: 'Accept', meaning: 'Aceptar', tag: 'v' },
+      { word: 'Accident', meaning: 'Accidente', tag: 'n' },
+      { word: 'Account', meaning: 'Cuenta', tag: 'n' },
+      { word: 'Achieve', meaning: 'Lograr', tag: 'v' },
+      { word: 'Across', meaning: 'A través de', tag: 'prep' },
+      { word: 'Act', meaning: 'Actuar', tag: 'v' },
+      { word: 'Active', meaning: 'Activo', tag: 'adj' },
+      { word: 'Activity', meaning: 'Actividad', tag: 'n' },
+      { word: 'Actually', meaning: 'Realmente', tag: 'adv' },
+      { word: 'Add', meaning: 'Añadir', tag: 'v' },
+      { word: 'Address', meaning: 'Dirección', tag: 'n' },
+      { word: 'Admire', meaning: 'Admirar', tag: 'v' },
+      { word: 'Adopt', meaning: 'Adoptar', tag: 'v' },
+      { word: 'Advance', meaning: 'Avance', tag: 'n' },
+      { word: 'Advantage', meaning: 'Ventaja', tag: 'n' },
+      { word: 'Adventure', meaning: 'Aventura', tag: 'n' },
+      { word: 'Afford', meaning: 'Permitirse', tag: 'v' },
+      { word: 'Agree', meaning: 'Acordar', tag: 'v' },
+      { word: 'Allow', meaning: 'Permitir', tag: 'v' },
+      { word: 'Amaze', meaning: 'Asombrar', tag: 'v' },
+      { word: 'Amount', meaning: 'Cantidad', tag: 'n' },
+      { word: 'Ancient', meaning: 'Antiguo', tag: 'adj' },
+      { word: 'Angry', meaning: 'Enojado', tag: 'adj' },
+      { word: 'Announce', meaning: 'Anunciar', tag: 'v' },
+      { word: 'Anxious', meaning: 'Ansioso', tag: 'adj' },
+      { word: 'Apologize', meaning: 'Disculparse', tag: 'v' },
+      { word: 'Appear', meaning: 'Aparecer', tag: 'v' },
+      { word: 'Apply', meaning: 'Aplicar', tag: 'v' },
+      { word: 'Approach', meaning: 'Acercarse', tag: 'v' },
+      { word: 'Arrange', meaning: 'Arreglar', tag: 'v' },
+      { word: 'Arrive', meaning: 'Llegar', tag: 'v' },
+      { word: 'Attack', meaning: 'Atacar', tag: 'v' },
+      { word: 'Attempt', meaning: 'Intentar', tag: 'v' },
+      { word: 'Attend', meaning: 'Asistir', tag: 'v' },
+      { word: 'Attract', meaning: 'Atraer', tag: 'v' },
+      { word: 'Avoid', meaning: 'Evitar', tag: 'v' },
+      { word: 'Awake', meaning: 'Despierto', tag: 'adj' },
+      { word: 'Balance', meaning: 'Equilibrio', tag: 'n' },
+      { word: 'Barrier', meaning: 'Barrera', tag: 'n' },
+      { word: 'Basis', meaning: 'Base', tag: 'n' },
+      { word: 'Beat', meaning: 'Golpear / Vencer', tag: 'v' },
+      { word: 'Become', meaning: 'Convertirse en', tag: 'v' },
+      { word: 'Behavior', meaning: 'Comportamiento', tag: 'n' },
+      { word: 'Benefit', meaning: 'Beneficio', tag: 'n' },
+      { word: 'Bitter', meaning: 'Amargo', tag: 'adj' },
+      { word: 'Blame', meaning: 'Culpar', tag: 'v' },
+      { word: 'Bold', meaning: 'Audaz', tag: 'adj' },
+      { word: 'Borrow', meaning: 'Pedir prestado', tag: 'v' },
+      { word: 'Boundary', meaning: 'Límite', tag: 'n' },
+      { word: 'Brilliant', meaning: 'Brillante', tag: 'adj' },
+      { word: 'Budget', meaning: 'Presupuesto', tag: 'n' },
+      { word: 'Capable', meaning: 'Capaz', tag: 'adj' },
+      { word: 'Cause', meaning: 'Causa', tag: 'n' },
+      { word: 'Celebrate', meaning: 'Celebrar', tag: 'v' },
+      { word: 'Challenge', meaning: 'Desafío', tag: 'n' },
+      { word: 'Character', meaning: 'Personaje / Carácter', tag: 'n' },
+      { word: 'Cheerful', meaning: 'Alegre', tag: 'adj' },
+      { word: 'Choice', meaning: 'Elección', tag: 'n' },
+      { word: 'Comfort', meaning: 'Comodidad', tag: 'n' },
+      { word: 'Commit', meaning: 'Comprometerse', tag: 'v' },
+      { word: 'Compare', meaning: 'Comparar', tag: 'v' },
+      { word: 'Compete', meaning: 'Competir', tag: 'v' },
+      { word: 'Confident', meaning: 'Seguro de sí mismo', tag: 'adj' },
+      { word: 'Connect', meaning: 'Conectar', tag: 'v' },
+      { word: 'Conquer', meaning: 'Conquistar', tag: 'v' },
+      { word: 'Conscious', meaning: 'Consciente', tag: 'adj' },
+      { word: 'Contain', meaning: 'Contener', tag: 'v' },
+      { word: 'Contribute', meaning: 'Contribuir', tag: 'v' },
+      { word: 'Control', meaning: 'Controlar', tag: 'v' },
+      { word: 'Convey', meaning: 'Transmitir', tag: 'v' },
+      { word: 'Courage', meaning: 'Coraje', tag: 'n' },
+      { word: 'Creative', meaning: 'Creativo', tag: 'adj' },
+      { word: 'Crisis', meaning: 'Crisis', tag: 'n' },
+      { word: 'Critical', meaning: 'Crítico', tag: 'adj' },
+      { word: 'Curious', meaning: 'Curioso', tag: 'adj' },
+      { word: 'Decade', meaning: 'Década', tag: 'n' },
+      { word: 'Declare', meaning: 'Declarar', tag: 'v' },
+      { word: 'Defeat', meaning: 'Derrota', tag: 'n' },
+      { word: 'Defend', meaning: 'Defender', tag: 'v' },
+      { word: 'Definite', meaning: 'Definitivo', tag: 'adj' },
+      { word: 'Deliver', meaning: 'Entregar', tag: 'v' },
+      { word: 'Demand', meaning: 'Exigir', tag: 'v' },
+      { word: 'Depend', meaning: 'Depender', tag: 'v' },
+      { word: 'Deserve', meaning: 'Merecer', tag: 'v' },
+      { word: 'Destroy', meaning: 'Destruir', tag: 'v' },
+      { word: 'Determine', meaning: 'Determinar', tag: 'v' },
+      { word: 'Develop', meaning: 'Desarrollar', tag: 'v' },
+      { word: 'Devote', meaning: 'Dedicar', tag: 'v' },
+      { word: 'Discover', meaning: 'Descubrir', tag: 'v' },
+      { word: 'Divide', meaning: 'Dividir', tag: 'v' },
+      { word: 'Dominate', meaning: 'Dominar', tag: 'v' },
+      { word: 'Eager', meaning: 'Ansioso', tag: 'adj' },
+      { word: 'Emerge', meaning: 'Surgir', tag: 'v' },
+      { word: 'Empower', meaning: 'Empoderar', tag: 'v' },
+      { word: 'Enhance', meaning: 'Mejorar', tag: 'v' },
+      { word: 'Enjoy', meaning: 'Disfrutar', tag: 'v' },
+      { word: 'Enormous', meaning: 'Enorme', tag: 'adj' },
+      { word: 'Enthusiastic', meaning: 'Entusiasta', tag: 'adj' },
+      { word: 'Establish', meaning: 'Establecer', tag: 'v' },
+      { word: 'Evolve', meaning: 'Evolucionar', tag: 'v' },
+      { word: 'Examine', meaning: 'Examinar', tag: 'v' },
+      { word: 'Exceed', meaning: 'Exceder', tag: 'v' },
+    ];
+
+    const speakingData = [{
+      id: 0,
+      titleEn: '🗣️ Conversation 1: At the Restaurant',
+      titleEs: '🗣️ Conversación 1: En el Restaurante',
+      dialogueEn: [
+        { speaker: 'Customer', text: 'Can I have a table for two, please?' },
+        { speaker: 'Waiter', text: 'Of course, follow me. Here is your menu.' },
+        { speaker: 'Customer', text: 'Thank you. I\'d like the pasta and a glass of water.' },
+        { speaker: 'Waiter', text: 'Great choice. I\'ll bring it right away.' }
+      ],
+      dialogueEs: [
+        { speaker: 'Cliente', text: '¿Puedo tener una mesa para dos, por favor?' },
+        { speaker: 'Camarero', text: 'Por supuesto, sígueme. Aquí tienes el menú.' },
+        { speaker: 'Cliente', text: 'Gracias. Me gustaría la pasta y un vaso de agua.' },
+        { speaker: 'Camarero', text: 'Buena elección. Lo traeré enseguida.' }
+      ],
+      questionsEn: [
+        { q: 'What does the customer ask for first?', a: 'A table for two' },
+        { q: 'What does the customer order to eat?', a: 'Pasta' },
+        { q: 'What does the customer order to drink?', a: 'A glass of water' }
+      ],
+      questionsEs: [
+        { q: '¿Qué pide el cliente primero?', a: 'Una mesa para dos' },
+        { q: '¿Qué pide el cliente para comer?', a: 'Pasta' },
+        { q: '¿Qué pide el cliente para beber?', a: 'Un vaso de agua' }
+      ]
+    }, {
+      id: 1,
+      titleEn: '🗣️ Conversation 2: Making Plans',
+      titleEs: '🗣️ Conversación 2: Haciendo Planes',
+      dialogueEn: [
+        { speaker: 'Anna', text: 'Hi, Tom. Are you free this weekend?' },
+        { speaker: 'Tom', text: 'Yes, I am. What do you have in mind?' },
+        { speaker: 'Anna', text: 'I was thinking of going to the cinema. Would you like to join me?' },
+        { speaker: 'Tom', text: 'That sounds great. What time?' },
+        { speaker: 'Anna', text: 'How about 7 PM on Saturday?' },
+        { speaker: 'Tom', text: 'Perfect. See you then.' }
+      ],
+      dialogueEs: [
+        { speaker: 'Anna', text: 'Hola, Tom. ¿Estás libre este fin de semana?' },
+        { speaker: 'Tom', text: 'Sí, lo estoy. ¿Qué tienes en mente?' },
+        { speaker: 'Anna', text: 'Estaba pensando en ir al cine. ¿Te gustaría acompañarme?' },
+        { speaker: 'Tom', text: 'Suena genial. ¿A qué hora?' },
+        { speaker: 'Anna', text: '¿Qué tal a las 7 PM el sábado?' },
+        { speaker: 'Tom', text: 'Perfecto. Nos vemos entonces.' }
+      ],
+      questionsEn: [
+        { q: 'What are Anna and Tom planning?', a: 'Going to the cinema' },
+        { q: 'When are they planning to meet?', a: 'Saturday at 7 PM' },
+        { q: 'Who is free this weekend?', a: 'Tom' }
+      ],
+      questionsEs: [
+        { q: '¿Qué planean Anna y Tom?', a: 'Ir al cine' },
+        { q: '¿Cuándo planean encontrarse?', a: 'El sábado a las 7 PM' },
+        { q: '¿Quién está libre este fin de semana?', a: 'Tom' }
+      ]
+    }, {
+      id: 2,
+      titleEn: '🗣️ Conversation 3: At the Doctor\'s',
+      titleEs: '🗣️ Conversación 3: En el Médico',
+      dialogueEn: [
+        { speaker: 'Doctor', text: 'Good morning. What seems to be the problem?' },
+        { speaker: 'Patient', text: 'I have a terrible headache and I feel dizzy.' },
+        { speaker: 'Doctor', text: 'I see. Let me take your temperature. You have a mild fever. I\'ll prescribe some medicine. Take it twice a day and rest.' },
+        { speaker: 'Patient', text: 'Thank you, doctor.' }
+      ],
+      dialogueEs: [
+        { speaker: 'Doctor', text: 'Buenos días. ¿Qué problema tiene?' },
+        { speaker: 'Paciente', text: 'Tengo un dolor de cabeza terrible y me siento mareado.' },
+        { speaker: 'Doctor', text: 'Ya veo. Déjame tomarte la temperatura. Tienes fiebre leve. Te recetaré un medicamento. Tómalo dos veces al día y descansa.' },
+        { speaker: 'Paciente', text: 'Gracias, doctor.' }
+      ],
+      questionsEn: [
+        { q: 'What are the patient\'s symptoms?', a: 'Terrible headache and dizziness' },
+        { q: 'What does the doctor prescribe?', a: 'Some medicine' },
+        { q: 'How often should the patient take the medicine?', a: 'Twice a day' }
+      ],
+      questionsEs: [
+        { q: '¿Cuáles son los síntomas del paciente?', a: 'Dolor de cabeza terrible y mareos' },
+        { q: '¿Qué receta el médico?', a: 'Un medicamento' },
+        { q: '¿Con qué frecuencia debe tomar el medicamento el paciente?', a: 'Dos veces al día' }
+      ]
+    }];
+
+    const creditsData = [
+      { name: 'Camilo Andrés Nossa Acuña', image: 'CamiloPE.jpeg' },
+      { name: 'Juan Manuel Santos Mesa', image: 'YoPE.jpeg' },
+      { name: 'Andrés Felipe Trujillo Gutierrez', image: 'AndresPE.jpeg' },
+      { name: 'Kevin Alexander Cardenas Beltrán', image: 'KevinPE.jpeg' },
+      { name: 'Shary Nicol Agudelo Quintero', image: 'SharyPE.jpeg' },
+      { name: 'Yelany Rincon Sotaquira', image: 'YelanyPE.jpeg' },
+      { name: 'Johan Steven Perez Giral', image: 'JohanPE.jpeg' }
+    ];
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let currentLang = 'en';
+    let currentVerbFilter = 'all';
+    let currentVerbSearch = '';
+
+    // ================================================================
+    // THEME TOGGLE
+    // ================================================================
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+        themeToggle.title = 'Switch to dark mode';
+      } else {
+        document.body.classList.remove('light-mode');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+        themeToggle.title = 'Switch to light mode';
+      }
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('presenteasy-theme') || 'dark';
+    applyTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.contains('light-mode');
+      const newTheme = isLight ? 'dark' : 'light';
+      applyTheme(newTheme);
+      localStorage.setItem('presenteasy-theme', newTheme);
+    });
+
+    // ================================================================
+    // NAVIGATION
+    // ================================================================
+    const navBtns = document.querySelectorAll('.nav-links button');
+    const pages = {
+      welcome: document.getElementById('welcome'),
+      verbs: document.getElementById('verbs'),
+      vocab: document.getElementById('vocab'),
+      texts: document.getElementById('texts'),
+      games: document.getElementById('games'),
+      speaking: document.getElementById('speaking'),
+      credits: document.getElementById('credits')
+    };
+
+    function navigateTo(pageId) {
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+      Object.keys(pages).forEach(key => {
+        pages[key].classList.toggle('active', key === pageId);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigateTo(btn.dataset.page);
+      });
+    });
+
+    // ================================================================
+    // PARTICLES
+    // ================================================================
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 35; i++) {
+        const span = document.createElement('span');
+        const size = 4 + Math.random() * 10;
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        span.style.left = Math.random() * 100 + '%';
+        span.style.animationDuration = 18 + Math.random() * 28 + 's';
+        span.style.animationDelay = Math.random() * 25 + 's';
+        span.style.opacity = 0.15 + Math.random() * 0.3;
+        const colors = ['rgba(79,172,254,', 'rgba(245,87,108,', 'rgba(240,147,251,', 'rgba(67,233,123,'];
+        span.style.background = colors[Math.floor(Math.random() * colors.length)] + (0.04 + Math.random() * 0.06) +
+          ')';
+        container.appendChild(span);
+      }
+    })();
+
+    // ================================================================
+    // SPEECH SYNTHESIS WRAPPER (offline)
+    // ================================================================
+    function speakText(text, callback) {
+      if (!window.speechSynthesis) {
+        alert('⚠️ Speech synthesis is not supported in this browser. Please use a modern browser.');
+        if (callback) callback();
+        return;
+      }
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.85;
+      utterance.onend = () => {
+        if (callback) callback();
+      };
+      utterance.onerror = (e) => {
+        console.warn('Speech error:', e);
+        if (callback) callback();
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ================================================================
+    // RENDER FUNCTIONS
+    // ================================================================
+
+    function renderHome() {
+      const intro = document.getElementById('welcomeIntro');
+      const objective = document.getElementById('welcomeObjective');
+      const badges = {
+        games: document.getElementById('badgeGames'),
+        verbs: document.getElementById('badgeVerbs'),
+        texts: document.getElementById('badgeTexts'),
+        vocab: document.getElementById('badgeVocab'),
+        speaking: document.getElementById('badgeSpeaking'),
+        credits: document.getElementById('badgeCredits')
+      };
+      const startBtn = document.getElementById('startBtnText');
+
+      if (currentLang === 'en') {
+        intro.innerHTML =
+          `<strong>Welcome to Presenteasy</strong> — your ultimate interactive English learning hub! Here, you can master <strong>vocabulary</strong>, <strong>grammar</strong>, and <strong>reading</strong> through fun and engaging games, comprehensive verb lists, short reading passages with comprehension questions, and a rich glossary of 100 essential words. Whether you are a beginner or an expert, Presenteasy adapts to your level and makes learning English an exciting journey.`;
+        objective.innerHTML =
+          `<p><i class="fas fa-bullseye"></i> <strong>Our goal:</strong> Make English learning <strong>fun</strong>, <strong>colorful</strong>, and <strong>accessible</strong> for everyone. Explore, play, and improve every day!</p>`;
+        badges.games.textContent = '5 Games';
+        badges.verbs.textContent = '100+ Verbs';
+        badges.texts.textContent = '4 Texts';
+        badges.vocab.textContent = '100 Words';
+        badges.speaking.textContent = '3 Conversations';
+        badges.credits.textContent = '7 Creators';
+        startBtn.textContent = 'Start Learning';
+      } else {
+        intro.innerHTML =
+          `<strong>Bienvenido a Presenteasy</strong> — tu centro de aprendizaje interactivo de inglés definitivo. Aquí podrás dominar <strong>vocabulario</strong>, <strong>gramática</strong> y <strong>lectura</strong> a través de juegos divertidos y atractivos, listas completas de verbos, pasajes de lectura cortos con preguntas de comprensión, y un rico glosario de 100 palabras esenciales. Ya seas principiante o experto, Presenteasy se adapta a tu nivel y hace que aprender inglés sea un viaje emocionante.`;
+        objective.innerHTML =
+          `<p><i class="fas fa-bullseye"></i> <strong>Nuestro objetivo:</strong> Hacer que el aprendizaje del inglés sea <strong>divertido</strong>, <strong>colorido</strong> y <strong>accesible</strong> para todos. ¡Explora, juega y mejora cada día!</p>`;
+        badges.games.textContent = '5 Juegos';
+        badges.verbs.textContent = '100+ Verbos';
+        badges.texts.textContent = '4 Textos';
+        badges.vocab.textContent = '100 Palabras';
+        badges.speaking.textContent = '3 Conversaciones';
+        badges.credits.textContent = '7 Creadores';
+        startBtn.textContent = 'Empezar a Aprender';
+      }
+    }
+
+    function renderGames() {
+      const grid = document.getElementById('gamesGrid');
+      const title = document.getElementById('gamesTitle');
+      const sub = document.getElementById('gamesSub');
+      if (currentLang === 'en') {
+        title.innerHTML = `<i class="fas fa-gamepad" style="color:#f093fb;"></i> Games`;
+        sub.textContent = 'Choose a game, answer questions, and earn your score. Each level is a new challenge!';
+      } else {
+        title.innerHTML = `<i class="fas fa-gamepad" style="color:#f093fb;"></i> Juegos`;
+        sub.textContent = 'Elige un juego, responde preguntas y gana puntos. ¡Cada nivel es un nuevo reto!';
+      }
+
+      grid.innerHTML = '';
+      gamesData.forEach((game, idx) => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        const diffClass = game.difficulty;
+        const diffLabel = game.difficulty.charAt(0).toUpperCase() + game.difficulty.slice(1);
+        const titleText = currentLang === 'en' ? game.titleEn : game.titleEs;
+        const descText = currentLang === 'en' ? game.descEn : game.descEs;
+        const qCount = game.questionsEn.length;
+        card.innerHTML = `
+          <div class="card-content">
+            <span class="difficulty ${diffClass}">${diffLabel}</span>
+            <h3>${titleText}</h3>
+            <p>${descText}</p>
+            <button class="play-btn" data-game="${idx}"><i class="fas fa-play"></i> ${currentLang === 'en' ? 'Play' : 'Jugar'}</button>
+            <div class="question-count"><i class="fas fa-question-circle"></i> ${qCount} ${currentLang === 'en' ? 'questions' : 'preguntas'}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.game);
+          openGame(idx);
+        });
+      });
+    }
+
+    // ---- GAME MODAL ----
+    const modal = document.getElementById('gameModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    let currentGame = null;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function openGame(idx) {
+      currentGame = gamesData[idx];
+      currentQuestionIndex = 0;
+      score = 0;
+      modalTitle.textContent = currentLang === 'en' ? currentGame.titleEn : currentGame.titleEs;
+      modal.classList.add('open');
+      renderQuestion();
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+    }
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    function renderQuestion() {
+      const game = currentGame;
+      if (!game) return;
+      const questions = currentLang === 'en' ? game.questionsEn : game.questionsEs;
+      if (currentQuestionIndex >= questions.length) {
+        showScore();
+        return;
+      }
+      const q = questions[currentQuestionIndex];
+      answered = false;
+      const isLast = currentQuestionIndex === questions.length - 1;
+      const nextLabel = currentLang === 'en' ? (isLast ? 'See result' : 'Next →') : (isLast ? 'Ver resultado' : 'Siguiente →');
+
+      modalBody.innerHTML = `
+        <div class="question-number"><i class="fas fa-list-ol"></i> ${currentLang === 'en' ? 'Question' : 'Pregunta'} ${currentQuestionIndex + 1} of ${questions.length}</div>
+        <div class="question-text">${q.q}</div>
+        <div class="options" id="optionsContainer">
+          ${q.options.map((opt, i) => `
+            <button data-opt="${i}">${opt}</button>
+          `).join('')}
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn ${isLast ? '' : 'show'}" id="nextBtn">${nextLabel}</button>
+      `;
+
+      const optBtns = modalBody.querySelectorAll('.options button');
+      const feedback = document.getElementById('feedback');
+      const nextBtn = document.getElementById('nextBtn');
+
+      optBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          const selected = parseInt(btn.dataset.opt);
+          const correct = q.answer;
+          answered = true;
+          optBtns.forEach(b => b.disabled = true);
+          optBtns.forEach((b, i) => {
+            if (i === correct) b.classList.add('correct');
+            if (i === selected && i !== correct) b.classList.add('wrong');
+          });
+          if (selected === correct) {
+            score++;
+            feedback.className = 'feedback show correct';
+            feedback.textContent = currentLang === 'en' ? '✅ Correct!' : '✅ ¡Correcto!';
+          } else {
+            feedback.className = 'feedback show wrong';
+            feedback.textContent = (currentLang === 'en' ?
+              `❌ Incorrect. The correct answer was: "${q.options[correct]}"` :
+              `❌ Incorrecto. La respuesta correcta era: "${q.options[correct]}"`);
+          }
+          nextBtn.classList.add('show');
+        });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        currentQuestionIndex++;
+        renderQuestion();
+      });
+    }
+
+    function showScore() {
+      const total = (currentLang === 'en' ? currentGame.questionsEn : currentGame.questionsEs).length;
+      const msg = currentLang === 'en' ?
+        (score === total ? '🏆 Perfect! You\'re an expert.' :
+          score >= total * 0.7 ? '🌟 Great job! Keep it up.' :
+          score >= total * 0.4 ? '📖 Good effort, keep practicing.' :
+          '💪 Don\'t give up, practice more!') :
+        (score === total ? '🏆 ¡Perfecto! Eres un experto.' :
+          score >= total * 0.7 ? '🌟 ¡Muy bien! Sigue así.' :
+          score >= total * 0.4 ? '📖 Buen intento, sigue practicando.' :
+          '💪 No te rindas, ¡practica más!');
+      modalBody.innerHTML = `
+        <div class="score-display">
+          <div class="big-score">${score} / ${total}</div>
+          <p>${msg}</p>
+          <div>
+            <button class="restart-btn" id="restartGame"><i class="fas fa-redo"></i> ${currentLang === 'en' ? 'Play again' : 'Jugar de nuevo'}</button>
+            <button class="restart-btn" style="background:linear-gradient(135deg,#4facfe,#43e97b);" id="closeGameModal"><i class="fas fa-times"></i> ${currentLang === 'en' ? 'Close' : 'Cerrar'}</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('restartGame')?.addEventListener('click', () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        renderQuestion();
+      });
+      document.getElementById('closeGameModal')?.addEventListener('click', closeModal);
+    }
+
+    // ---- VERBS ----
+    function renderVerbs() {
+      const list = document.getElementById('verbsList');
+      const stats = document.getElementById('verbsStats');
+      const search = document.getElementById('verbSearch').value.toLowerCase().trim();
+
+      let filtered = verbsData;
+      if (currentVerbFilter !== 'all') {
+        filtered = filtered.filter(v => v.type === currentVerbFilter);
+      }
+      if (search) {
+        filtered = filtered.filter(v =>
+          v.infinitive.toLowerCase().includes(search) ||
+          v.spanish.toLowerCase().includes(search)
+        );
+      }
+
+      const regularCount = verbsData.filter(v => v.type === 'regular').length;
+      const irregularCount = verbsData.filter(v => v.type === 'irregular').length;
+      stats.textContent = `Showing ${filtered.length} verbs — ${regularCount} regular · ${irregularCount} irregular`;
+
+      list.innerHTML = '';
+      filtered.forEach(v => {
+        const item = document.createElement('div');
+        item.className = 'verb-item';
+
+        function createRow(label, value) {
+          const row = document.createElement('div');
+          row.className = 'verb-row';
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'verb-form-label';
+          labelSpan.textContent = label + ':';
+          const valueSpan = document.createElement('span');
+          valueSpan.className = 'verb-form-value';
+          valueSpan.textContent = value;
+          const audioBtn = document.createElement('button');
+          audioBtn.className = 'verb-audio-btn';
+          audioBtn.dataset.word = value;
+          audioBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+          row.appendChild(labelSpan);
+          row.appendChild(valueSpan);
+          row.appendChild(audioBtn);
+          return row;
+        }
+
+        item.appendChild(createRow('Infinitive', v.infinitive));
+        item.appendChild(createRow('Past', v.past));
+        item.appendChild(createRow('Past Participle', v.pastParticiple));
+
+        const esDiv = document.createElement('div');
+        esDiv.className = 'verb-es';
+        esDiv.textContent = v.spanish;
+        item.appendChild(esDiv);
+
+        const typeSpan = document.createElement('span');
+        typeSpan.className = `verb-type ${v.type}`;
+        typeSpan.textContent = v.type === 'regular' ? '✅ Regular' : '⚡ Irregular';
+        item.appendChild(typeSpan);
+
+        list.appendChild(item);
+      });
+
+      document.querySelectorAll('.verb-audio-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const word = btn.dataset.word;
+          speakText(word);
+        });
+      });
+    }
+
+    // ---- TEXTS ----
+    function renderTexts() {
+      const grid = document.getElementById('textsGrid');
+      const title = document.getElementById('textsTitle');
+      const sub = document.getElementById('textsSub');
+      if (currentLang === 'en') {
+        title.innerHTML = `<i class="fas fa-file-alt" style="color:#43e97b;"></i> Texts`;
+        sub.textContent = 'Read short passages and answer 3 simple questions to test your comprehension.';
+      } else {
+        title.innerHTML = `<i class="fas fa-file-alt" style="color:#43e97b;"></i> Textos`;
+        sub.textContent = 'Lee pasajes cortos y responde 3 preguntas sencillas para poner a prueba tu comprensión.';
+      }
+
+      grid.innerHTML = '';
+      textsData.forEach((text, idx) => {
+        const card = document.createElement('div');
+        card.className = 'text-card';
+        const tTitle = currentLang === 'en' ? text.titleEn : text.titleEs;
+        const tBody = currentLang === 'en' ? text.bodyEn : text.bodyEs;
+        const questions = currentLang === 'en' ? text.questionsEn : text.questionsEs;
+        let qHtml = questions.map((q, qi) => `
+          <div class="q-item">
+            <strong>${qi + 1}.</strong> ${q.q}
+            <span class="answer hidden" id="ans_${idx}_${qi}">✅ ${q.a}</span>
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="text-title">${tTitle}</div>
+          <div class="text-body">${tBody}</div>
+          <div class="text-questions">${qHtml}</div>
+          <button class="show-answers-btn" data-text="${idx}"><i class="fas fa-eye"></i> ${currentLang === 'en' ? 'Show answers' : 'Mostrar respuestas'}</button>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll('.show-answers-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.text);
+          const answers = document.querySelectorAll(`#textsGrid .text-card`)[idx].querySelectorAll('.answer');
+          const allHidden = Array.from(answers).every(a => a.classList.contains('hidden'));
+          answers.forEach(a => a.classList.toggle('hidden', !allHidden));
+          btn.innerHTML = allHidden ?
+            `<i class="fas fa-eye-slash"></i> ${currentLang === 'en' ? 'Hide answers' : 'Ocultar respuestas'}` :
+            `<i class="fas fa-eye"></i> ${currentLang === 'en' ? 'Show answers' : 'Mostrar respuestas'}`;
+        });
+      });
+    }
+
+    // ---- VOCAB ----
+    function renderVocab(filter = '') {
+      const grid = document.getElementById('vocabGrid');
+      const count = document.getElementById('vocabCount');
+      const search = filter.toLowerCase().trim();
+      const filtered = search === '' ? vocabData : vocabData.filter(v =>
+        v.word.toLowerCase().includes(search) || v.meaning.toLowerCase().includes(search)
+      );
+      count.textContent = `Showing ${filtered.length} of ${vocabData.length} words`;
+      grid.innerHTML = '';
+      filtered.forEach(v => {
+        const item = document.createElement('div');
+        item.className = 'vocab-item';
+        item.innerHTML = `
+          <div class="vocab-head">
+            <span class="vocab-word">${v.word}</span>
+            <button class="vocab-audio-btn" data-word="${v.word}" title="Pronounce this word"><i class="fas fa-volume-up"></i></button>
+          </div>
+          <div class="vocab-meaning">${v.meaning}</div>
+          <span class="vocab-tag">${v.tag}</span>
+        `;
+        grid.appendChild(item);
+      });
+
+      document.querySelectorAll('.vocab-audio-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const word = btn.dataset.word;
+          speakText(word);
+        });
+      });
+    }
+
+    // ---- SPEAKING ----
+    function renderSpeaking() {
+      const grid = document.getElementById('speakingGrid');
+      const title = document.getElementById('speakingTitle');
+      const sub = document.getElementById('speakingSub');
+
+      if (currentLang === 'en') {
+        title.innerHTML = `<i class="fas fa-microphone-alt" style="color:#f093fb;"></i> Speaking`;
+        sub.textContent = 'Listen to each line of the conversations. Practice your listening and pronunciation!';
+      } else {
+        title.innerHTML = `<i class="fas fa-microphone-alt" style="color:#f093fb;"></i> Speaking`;
+        sub.textContent = 'Escucha cada línea de las conversaciones. ¡Practica tu comprensión auditiva y pronunciación!';
+      }
+
+      grid.innerHTML = '';
+      speakingData.forEach((conv, idx) => {
+        const card = document.createElement('div');
+        card.className = 'speaking-card';
+        const cTitle = currentLang === 'en' ? conv.titleEn : conv.titleEs;
+        const dialogue = currentLang === 'en' ? conv.dialogueEn : conv.dialogueEs;
+        const questions = currentLang === 'en' ? conv.questionsEn : conv.questionsEs;
+
+        let dialogueHtml = '';
+        dialogue.forEach(line => {
+          dialogueHtml += `
+            <div class="dialogue-line">
+              <span class="speaker">${line.speaker}:</span>
+              <span class="text">${line.text}</span>
+              <button class="listen-btn" data-text="${line.text.replace(/"/g, '&quot;')}"><i class="fas fa-volume-up"></i> Listen</button>
+            </div>
+          `;
+        });
+
+        let qHtml = questions.map((q, qi) => `
+          <div class="q-item">
+            <strong>${qi + 1}.</strong> ${q.q}
+            <span class="answer hidden" id="sans_${idx}_${qi}">✅ ${q.a}</span>
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="conv-title">${cTitle}</div>
+          <div class="dialogue-container">
+            ${dialogueHtml}
+          </div>
+          <div class="conv-questions">
+            ${qHtml}
+            <button class="show-answers-btn" data-speaking="${idx}"><i class="fas fa-eye"></i> ${currentLang === 'en' ? 'Show answers' : 'Mostrar respuestas'}</button>
+          </div>
+        `;
+        grid.appendChild(card);
+
+        card.querySelectorAll('.listen-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const text = btn.dataset.text;
+            speakText(text);
+          });
+        });
+
+        const answerBtn = card.querySelector('.show-answers-btn');
+        answerBtn.addEventListener('click', () => {
+          const answers = card.querySelectorAll('.conv-questions .answer');
+          const allHidden = Array.from(answers).every(a => a.classList.contains('hidden'));
+          answers.forEach(a => a.classList.toggle('hidden', !allHidden));
+          answerBtn.innerHTML = allHidden ?
+            `<i class="fas fa-eye-slash"></i> ${currentLang === 'en' ? 'Hide answers' : 'Ocultar respuestas'}` :
+            `<i class="fas fa-eye"></i> ${currentLang === 'en' ? 'Show answers' : 'Mostrar respuestas'}`;
+        });
+      });
+    }
+
+    // ---- CREDITS ----
+    function renderCredits() {
+      const grid = document.getElementById('creditsGrid');
+      grid.innerHTML = '';
+      creditsData.forEach(person => {
+        const card = document.createElement('div');
+        card.className = 'credit-card';
+        const initials = person.name.split(' ').map(n => n[0]).join('');
+        card.innerHTML = `
+          <div class="photo-placeholder">
+            <img src="${person.image}" alt="${person.name}" 
+                 onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\\'font-size:2.6rem; font-weight:700; color:#fff;\\'>${initials}</span>';" />
+          </div>
+          <div class="credit-name">${person.name}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // ================================================================
+    // LANGUAGE SWITCH
+    // ================================================================
+    const langEn = document.getElementById('langEn');
+    const langEs = document.getElementById('langEs');
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      langEn.classList.toggle('active-lang', lang === 'en');
+      langEs.classList.toggle('active-lang', lang === 'es');
+      renderHome();
+      renderGames();
+      renderTexts();
+      renderSpeaking();
+    }
+
+    langEn.addEventListener('click', () => setLanguage('en'));
+    langEs.addEventListener('click', () => setLanguage('es'));
+
+    // ================================================================
+    // VERB SEARCH & FILTER
+    // ================================================================
+    const verbSearchInput = document.getElementById('verbSearch');
+    verbSearchInput.addEventListener('input', () => {
+      currentVerbSearch = verbSearchInput.value;
+      renderVerbs();
+    });
+
+    const verbTabs = document.querySelectorAll('.verbs-tabs button');
+    verbTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        verbTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentVerbFilter = tab.dataset.verbType;
+        renderVerbs();
+      });
+    });
+
+    // ================================================================
+    // VOCAB SEARCH
+    // ================================================================
+    const vocabSearchInput = document.getElementById('vocabSearch');
+    vocabSearchInput.addEventListener('input', (e) => {
+      renderVocab(e.target.value);
+    });
+
+    // ================================================================
+    // INIT
+    // ================================================================
+    renderHome();
+    renderGames();
+    renderVerbs();
+    renderTexts();
+    renderVocab();
+    renderSpeaking();
+    renderCredits();
+
+    console.log('✅ Imagen Home más grande + Modo claro/oscuro añadido.');
+  </script>
+</body>
+</html>
