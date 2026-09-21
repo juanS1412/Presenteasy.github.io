@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Verb Blaster · Conjugation Game</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1c1f2c;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; color: #d8d8e8; padding: 12px;
+  }
+  #wrap {
+    background: #2a2e40; border-radius: 14px; padding: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5); max-width: 100%;
+  }
+  #title {
+    text-align: center; color: #8f8fb8; font-size: 0.8rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px; font-weight: 600;
+  }
+  .canvas-wrap {
+    position: relative; display: inline-block;
+    line-height: 0; border-radius: 8px; overflow: hidden;
+  }
+  canvas {
+    display: block; background: #1a1e2c; border-radius: 8px;
+    max-width: 100%; height: auto; touch-action: none;
+  }
+  #hud {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 6px 0; font-size: 0.95rem; flex-wrap: wrap; gap: 10px;
+  }
+  #hud span b { color: #a8a8d8; font-size: 1.05rem; }
+  #instructions {
+    text-align: center; color: #6a6a88;
+    font-size: 0.78rem; margin-top: 8px;
+  }
+  /* ===== OVERLAY ===== */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(18, 22, 34, 0.95);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 30px; text-align: center; z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay .icon {
+    font-size: 3.6rem; margin-bottom: 6px;
+    filter: drop-shadow(0 0 24px rgba(168, 176, 232, 0.5));
+  }
+  .overlay h1 {
+    color: #a8b0d8; font-size: 2rem;
+    margin-bottom: 14px; letter-spacing: 1px;
+  }
+  .overlay .desc {
+    color: #c8c8e0; font-size: 1rem;
+    margin: 4px 0; max-width: 480px; line-height: 1.55;
+  }
+  .overlay .sub {
+    color: #6a6a88; font-size: 0.82rem; margin-top: 14px;
+  }
+  .overlay .stat {
+    color: #c8c8e0; font-size: 1.05rem; margin: 4px 0;
+  }
+  .overlay .stat b { color: #a8b0d8; font-size: 1.25rem; }
+  .overlay button {
+    margin-top: 26px;
+    background: #8a92c8; color: #1a1e2c;
+    border: none; padding: 16px 56px;
+    border-radius: 40px; font-size: 1.15rem;
+    font-weight: 800; cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 40px rgba(138, 146, 200, 0.5);
+    font-family: inherit;
+  }
+  .overlay button:hover {
+    background: #b0b8e8; transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(138, 146, 200, 0.8);
+  }
+  .overlay button:active { transform: scale(0.97); }
+  .back-button {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #7f88b8;
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 100;
+  transition: 0.2s;
+}
+
+.back-button:hover {
+  background: #a8b0d8;
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← Volver a Presenteasy</a>
+<div id="wrap">
+  <div id="title">⚡ Verb Blaster · Conjugation</div>
+  <div class="canvas-wrap">
+    <canvas id="game" width="820" height="540"></canvas>
+    <div class="overlay" id="overlay"></div>
+  </div>
+  <div id="hud">
+    <span>Score: <b id="score">0</b></span>
+    <span>Streak: <b id="streak">0</b></span>
+    <span>Lives: <b id="lives">❤❤❤</b></span>
+    <span>Level: <b id="level">1</b></span>
+  </div>
+  <div id="instructions">← → o A/D para mover · ESPACIO para disparar · Click/tap para apuntar y disparar</div>
+</div>
+
+<script>
+// ============================================================
+// VERB BLASTER · Conjugation Game
+// ============================================================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const overlay = document.getElementById('overlay');
+
+const verbData = [
+  { infinitive: 'go', past: 'went', participle: 'gone', gerund: 'going', wrong: 'goed' },
+  { infinitive: 'eat', past: 'ate', participle: 'eaten', gerund: 'eating', wrong: 'eated' },
+  { infinitive: 'see', past: 'saw', participle: 'seen', gerund: 'seeing', wrong: 'seed' },
+  { infinitive: 'take', past: 'took', participle: 'taken', gerund: 'taking', wrong: 'taked' },
+  { infinitive: 'come', past: 'came', participle: 'come', gerund: 'coming', wrong: 'comed' },
+  { infinitive: 'give', past: 'gave', participle: 'given', gerund: 'giving', wrong: 'gived' },
+  { infinitive: 'know', past: 'knew', participle: 'known', gerund: 'knowing', wrong: 'knowed' },
+  { infinitive: 'write', past: 'wrote', participle: 'written', gerund: 'writing', wrong: 'writed' },
+  { infinitive: 'speak', past: 'spoke', participle: 'spoken', gerund: 'speaking', wrong: 'speaked' },
+  { infinitive: 'break', past: 'broke', participle: 'broken', gerund: 'breaking', wrong: 'breaked' },
+  { infinitive: 'drive', past: 'drove', participle: 'driven', gerund: 'driving', wrong: 'drived' },
+  { infinitive: 'fly', past: 'flew', participle: 'flown', gerund: 'flying', wrong: 'flied' },
+  { infinitive: 'run', past: 'ran', participle: 'run', gerund: 'running', wrong: 'runned' },
+  { infinitive: 'buy', past: 'bought', participle: 'bought', gerund: 'buying', wrong: 'buyed' },
+  { infinitive: 'think', past: 'thought', participle: 'thought', gerund: 'thinking', wrong: 'thinked' },
+  { infinitive: 'bring', past: 'brought', participle: 'brought', gerund: 'bringing', wrong: 'bringed' },
+  { infinitive: 'catch', past: 'caught', participle: 'caught', gerund: 'catching', wrong: 'catched' },
+  { infinitive: 'teach', past: 'taught', participle: 'taught', gerund: 'teaching', wrong: 'teached' },
+  { infinitive: 'sleep', past: 'slept', participle: 'slept', gerund: 'sleeping', wrong: 'sleeped' },
+  { infinitive: 'drink', past: 'drank', participle: 'drunk', gerund: 'drinking', wrong: 'drinked' },
+  { infinitive: 'sing', past: 'sang', participle: 'sung', gerund: 'singing', wrong: 'singed' },
+  { infinitive: 'swim', past: 'swam', participle: 'swum', gerund: 'swimming', wrong: 'swimmed' },
+  { infinitive: 'begin', past: 'began', participle: 'begun', gerund: 'beginning', wrong: 'beginned' },
+  { infinitive: 'forget', past: 'forgot', participle: 'forgotten', gerund: 'forgetting', wrong: 'forgeted' },
+  { infinitive: 'choose', past: 'chose', participle: 'chosen', gerund: 'choosing', wrong: 'choosed' },
+  { infinitive: 'fall', past: 'fell', participle: 'fallen', gerund: 'falling', wrong: 'falled' },
+  { infinitive: 'feel', past: 'felt', participle: 'felt', gerund: 'feeling', wrong: 'feeled' },
+  { infinitive: 'find', past: 'found', participle: 'found', gerund: 'finding', wrong: 'finded' },
+  { infinitive: 'get', past: 'got', participle: 'gotten', gerund: 'getting', wrong: 'getted' },
+  { infinitive: 'hear', past: 'heard', participle: 'heard', gerund: 'hearing', wrong: 'heared' },
+  { infinitive: 'keep', past: 'kept', participle: 'kept', gerund: 'keeping', wrong: 'keeped' },
+  { infinitive: 'leave', past: 'left', participle: 'left', gerund: 'leaving', wrong: 'leaved' },
+  { infinitive: 'lose', past: 'lost', participle: 'lost', gerund: 'losing', wrong: 'losed' },
+  { infinitive: 'meet', past: 'met', participle: 'met', gerund: 'meeting', wrong: 'meeted' },
+  { infinitive: 'pay', past: 'paid', participle: 'paid', gerund: 'paying', wrong: 'payed' },
+  { infinitive: 'put', past: 'put', participle: 'put', gerund: 'putting', wrong: 'putted' },
+  { infinitive: 'read', past: 'read', participle: 'read', gerund: 'reading', wrong: 'readed' },
+  { infinitive: 'ride', past: 'rode', participle: 'ridden', gerund: 'riding', wrong: 'rided' },
+  { infinitive: 'say', past: 'said', participle: 'said', gerund: 'saying', wrong: 'sayed' },
+  { infinitive: 'sell', past: 'sold', participle: 'sold', gerund: 'selling', wrong: 'selled' },
+  { infinitive: 'send', past: 'sent', participle: 'sent', gerund: 'sending', wrong: 'sended' },
+  { infinitive: 'sit', past: 'sat', participle: 'sat', gerund: 'sitting', wrong: 'sitted' },
+  { infinitive: 'stand', past: 'stood', participle: 'stood', gerund: 'standing', wrong: 'standed' },
+  { infinitive: 'steal', past: 'stole', participle: 'stolen', gerund: 'stealing', wrong: 'stealed' },
+  { infinitive: 'wear', past: 'wore', participle: 'worn', gerund: 'wearing', wrong: 'weared' },
+  { infinitive: 'win', past: 'won', participle: 'won', gerund: 'winning', wrong: 'winned' },
+  { infinitive: 'become', past: 'became', participle: 'become', gerund: 'becoming', wrong: 'becomed' }
+];
+
+const player = { x: W/2 - 22, y: H - 62, w: 44, h: 44, speed: 540 };
+let projectiles = [], fallingWords = [], currentQuestion = null;
+let score = 0, lives = 3, streak = 0, correctCount = 0, level = 1;
+let gameStarted = false, gameOver = false, ended = false;
+let flash = { text: '', color: '', timer: 0 };
+let particles = [], explosions = [];
+let lastTime = 0, shootCooldown = 0;
+const keys = {};
+let aimX = null;
+
+function getLevelConfig() {
+  if (correctCount < 3)  return { options: 4, speed: 75,  spread: 0,    name: 1 };
+  if (correctCount < 6)  return { options: 4, speed: 100, spread: 0.1,  name: 2 };
+  if (correctCount < 10) return { options: 5, speed: 120, spread: 0.15, name: 3 };
+  if (correctCount < 14) return { options: 5, speed: 145, spread: 0.2,  name: 4 };
+  if (correctCount < 19) return { options: 6, speed: 170, spread: 0.25, name: 5 };
+  if (correctCount < 25) return { options: 6, speed: 200, spread: 0.3,  name: 6 };
+  return { options: 6, speed: 235, spread: 0.35, name: 7 };
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function spawnParticles(x, y, color, count = 14) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 300,
+      vy: (Math.random() - 0.5) * 300 - 80,
+      life: 0.7, maxLife: 0.7,
+      color, size: 3 + Math.random() * 3
+    });
+  }
+}
+function spawnExplosion(x, y, color) {
+  explosions.push({ x, y, r: 4, maxR: 42, life: 0.4, maxLife: 0.4, color });
+}
+
+function startRound() {
+  const cfg = getLevelConfig();
+  level = cfg.name;
+  const verb = verbData[Math.floor(Math.random() * verbData.length)];
+  const formTypes = [
+    { key: 'infinitive', label: 'INFINITIVO' },
+    { key: 'past', label: 'PASADO' },
+    { key: 'participle', label: 'PARTICIPIO' },
+    { key: 'gerund', label: 'GERUNDIO' }
+  ];
+  const shownIdx = Math.floor(Math.random() * formTypes.length);
+  let askIdx = Math.floor(Math.random() * (formTypes.length - 1));
+  if (askIdx >= shownIdx) askIdx++;
+  const shown = formTypes[shownIdx];
+  const ask = formTypes[askIdx];
+  const shownForm = verb[shown.key];
+  const correctForm = verb[ask.key];
+
+  const allOptions = [
+    { text: verb.infinitive, isCorrect: verb.infinitive === correctForm },
+    { text: verb.past, isCorrect: verb.past === correctForm },
+    { text: verb.participle, isCorrect: verb.participle === correctForm },
+    { text: verb.gerund, isCorrect: verb.gerund === correctForm },
+    { text: verb.wrong, isCorrect: verb.wrong === correctForm }
+  ];
+  const seen = new Set();
+  const unique = [];
+  for (const o of allOptions) {
+    const key = o.text.toLowerCase();
+    if (!seen.has(key)) { seen.add(key); unique.push(o); }
+  }
+  if (!unique.some(o => o.isCorrect)) unique.push({ text: correctForm, isCorrect: true });
+
+  const correctOption = unique.find(o => o.isCorrect);
+  const wrongOptions = unique.filter(o => !o.isCorrect);
+  shuffle(wrongOptions);
+  const numWrong = Math.min(cfg.options - 1, wrongOptions.length);
+  const selected = shuffle([correctOption, ...wrongOptions.slice(0, numWrong)]);
+
+  const laneCount = selected.length;
+  const laneW = W / laneCount;
+  fallingWords = selected.map((opt, i) => ({
+    text: opt.text, isCorrect: opt.isCorrect,
+    x: laneW * i + laneW / 2,
+    y: -40 - Math.random() * 60,
+    speed: cfg.speed * (1 + (Math.random() - 0.5) * cfg.spread),
+    h: 34
+  }));
+  currentQuestion = { prompt: ask.label + ' de "' + shownForm.toUpperCase() + '"', correct: correctForm };
+}
+
+// ============================================================
+// START / GAME OVER SCREENS
+// ============================================================
+function showStartScreen() {
+  overlay.innerHTML = `
+    <div class="icon">⚡</div>
+    <h1>Verb Blaster</h1>
+    <p class="desc">Dispara a la forma verbal correcta antes de que toque el suelo.</p>
+    <p class="desc">Todas las opciones son formas del mismo verbo. ¡Cuidado con las "regularizadas"!</p>
+    <p class="sub">← → o A/D para mover · ESPACIO para disparar</p>
+    <button id="startBtn">▶ JUGAR</button>
+  `;
+  overlay.classList.remove('hidden');
+  document.getElementById('startBtn').addEventListener('click', startGame);
+}
+
+function startGame() {
+  score = 0; lives = 3; streak = 0; correctCount = 0; level = 1;
+  gameOver = false; gameStarted = true; ended = false;
+  particles = []; explosions = []; projectiles = [];
+  flash = { text: '', color: '', timer: 0 };
+  player.x = W/2 - player.w/2;
+  startRound();
+  overlay.classList.add('hidden');
+}
+
+function endGame() {
+  if (ended) return;
+  ended = true;
+  gameOver = true;
+  overlay.innerHTML = `
+    <div class="icon">💀</div>
+    <h1>GAME OVER</h1>
+    <p class="stat">Puntuación: <b>${score}</b></p>
+    <p class="stat">Aciertos: <b>${correctCount}</b></p>
+    <p class="stat">Nivel alcanzado: <b>${level}</b></p>
+    <button id="startBtn">▶ JUGAR DE NUEVO</button>
+  `;
+  overlay.classList.remove('hidden');
+  document.getElementById('startBtn').addEventListener('click', startGame);
+}
+
+function shoot() {
+  if (!gameStarted || gameOver) return;
+  if (shootCooldown > 0) return;
+  shootCooldown = 0.14;
+  projectiles.push({ x: player.x + player.w / 2, y: player.y - 4, vy: -900, w: 4, h: 16 });
+  spawnParticles(player.x + player.w / 2, player.y, '#a8b8e8', 4);
+}
+
+function update(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.vy += 500 * dt;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    const ex = explosions[i];
+    ex.r += (ex.maxR - ex.r) * 8 * dt;
+    ex.life -= dt;
+    if (ex.life <= 0) explosions.splice(i, 1);
+  }
+  if (flash.timer > 0) flash.timer -= dt;
+  if (shootCooldown > 0) shootCooldown -= dt;
+
+  if (!gameStarted || gameOver) return;
+
+  let dir = 0;
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) dir -= 1;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) dir += 1;
+  if (aimX !== null) {
+    const targetX = aimX - player.w / 2;
+    const dx = targetX - player.x;
+    player.x += Math.max(-player.speed * dt, Math.min(player.speed * dt, dx * 0.3));
+  } else {
+    player.x += dir * player.speed * dt;
+  }
+  player.x = Math.max(0, Math.min(W - player.w, player.x));
+
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const p = projectiles[i];
+    p.y += p.vy * dt;
+    if (p.y + p.h < 0) { projectiles.splice(i, 1); continue; }
+    let hit = false;
+    for (let j = fallingWords.length - 1; j >= 0; j--) {
+      const fw = fallingWords[j];
+      const halfW = 62;
+      if (p.x > fw.x - halfW && p.x < fw.x + halfW &&
+          p.y < fw.y + fw.h && p.y + p.h > fw.y) {
+        hit = true;
+        if (fw.isCorrect) {
+          score += 15 + streak * 3; streak++; correctCount++;
+          flash = { text: '✓ ¡Correcto!', color: '#8fa8d8', timer: 0.5 };
+          spawnExplosion(fw.x, fw.y + fw.h/2, '#a8b8e8');
+          spawnParticles(fw.x, fw.y + fw.h/2, '#c8d8f8', 22);
+          startRound();
+          projectiles.splice(i, 1);
+          return;
+        } else {
+          lives--; streak = 0;
+          flash = { text: '✗ Incorrecto', color: '#c88a9a', timer: 0.5 };
+          spawnExplosion(fw.x, fw.y + fw.h/2, '#e8a8b8');
+          spawnParticles(fw.x, fw.y + fw.h/2, '#f8c8d8', 14);
+          fallingWords.splice(j, 1);
+          if (lives <= 0) { endGame(); return; }
+        }
+        break;
+      }
+    }
+    if (hit) projectiles.splice(i, 1);
+  }
+
+  let correctEscaped = false;
+  for (let i = fallingWords.length - 1; i >= 0; i--) {
+    const fw = fallingWords[i];
+    fw.y += fw.speed * dt;
+    if (fw.y > H) {
+      if (fw.isCorrect) correctEscaped = true;
+      fallingWords.splice(i, 1);
+    }
+  }
+  if (correctEscaped) {
+    lives--; streak = 0;
+    flash = { text: '✗ ¡Se escapó!', color: '#d8a878', timer: 0.7 };
+    if (lives <= 0) { endGame(); return; }
+    startRound();
+  }
+}
+
+function drawRoundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function render() {
+  ctx.fillStyle = '#1a1e2c'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(168, 168, 216, 0.08)';
+  for (let i = 0; i < 30; i++) { ctx.fillRect((i * 137) % W, (i * 79) % H, 2, 2); }
+  ctx.strokeStyle = 'rgba(168, 168, 216, 0.05)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.moveTo(W / 6 * i, 100); ctx.lineTo(W / 6 * i, H - 60); ctx.stroke(); }
+
+  if (currentQuestion) {
+    ctx.fillStyle = 'rgba(42, 46, 64, 0.92)';
+    drawRoundRect(W/2 - 320, 18, 640, 64, 14); ctx.fill();
+    ctx.strokeStyle = 'rgba(168, 168, 216, 0.2)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#6a6a88'; ctx.font = '600 11px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText('FORMA CORRECTA', W/2, 40);
+    ctx.fillStyle = '#e8e8f8'; ctx.font = 'bold 24px Segoe UI';
+    ctx.fillText('Elige: ' + currentQuestion.prompt, W/2, 68);
+  }
+
+  fallingWords.forEach(fw => {
+    ctx.fillStyle = '#3a3e58';
+    drawRoundRect(fw.x - 62, fw.y, 124, fw.h, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(168, 168, 216, 0.18)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#e8e8f8'; ctx.font = 'bold 17px Segoe UI';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(fw.text, fw.x, fw.y + fw.h/2 + 1);
+  });
+  ctx.textBaseline = 'alphabetic';
+
+  projectiles.forEach(p => {
+    ctx.fillStyle = '#a8b8e8'; ctx.fillRect(p.x - p.w/2, p.y, p.w, p.h);
+    ctx.fillStyle = '#e8f0ff'; ctx.fillRect(p.x - p.w/2 + 1, p.y, p.w - 2, p.h);
+    ctx.globalAlpha = 0.3; ctx.fillStyle = '#a8b8e8';
+    ctx.fillRect(p.x - p.w/2 - 2, p.y - 2, p.w + 4, p.h + 4);
+    ctx.globalAlpha = 1;
+  });
+
+  const px = player.x, py = player.y;
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  drawRoundRect(px + 2, py + 3, player.w, player.h, 8); ctx.fill();
+  ctx.fillStyle = '#7f88b8';
+  drawRoundRect(px, py, player.w, player.h, 8); ctx.fill();
+  ctx.strokeStyle = '#5a6088'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#a8b0d8';
+  drawRoundRect(px + player.w/2 - 5, py - 8, 10, 14, 3); ctx.fill();
+  ctx.fillStyle = '#4a5078';
+  ctx.beginPath(); ctx.arc(px + player.w/2, py + player.h/2, 6, 0, Math.PI * 2); ctx.fill();
+
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  explosions.forEach(ex => {
+    ctx.globalAlpha = ex.life / ex.maxLife;
+    ctx.strokeStyle = ex.color; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(ex.x, ex.y, ex.r, 0, Math.PI * 2); ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  if (flash.timer > 0) {
+    ctx.globalAlpha = Math.min(1, flash.timer * 1.8);
+    ctx.fillStyle = flash.color; ctx.font = 'bold 34px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(flash.text, W/2, H/2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('streak').textContent = streak;
+  document.getElementById('lives').textContent = '❤'.repeat(Math.max(0, lives)) + '·'.repeat(Math.max(0, 3 - lives));
+  document.getElementById('level').textContent = level;
+}
+
+function loop(ts) {
+  const dt = Math.min(0.05, (ts - lastTime) / 1000 || 0);
+  lastTime = ts;
+  update(dt); render(); updateHUD();
+  requestAnimationFrame(loop);
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  keys[e.key] = true;
+  if (e.key === ' ') {
+    e.preventDefault();
+    if (!overlay.classList.contains('hidden')) {
+      const btn = document.getElementById('startBtn');
+      if (btn) btn.click();
+    } else {
+      shoot();
+    }
+  }
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+function getEventX(e) {
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  let cx = e.clientX;
+  if (e.touches && e.touches[0]) cx = e.touches[0].clientX;
+  return (cx - rect.left) * sx;
+}
+canvas.addEventListener('mousemove', (e) => { aimX = getEventX(e); });
+canvas.addEventListener('mouseleave', () => { aimX = null; });
+canvas.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  if (!overlay.classList.contains('hidden')) return;
+  aimX = getEventX(e);
+  shoot();
+});
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  if (!overlay.classList.contains('hidden')) return;
+  aimX = getEventX(e);
+  shoot();
+}, { passive: false });
+canvas.addEventListener('touchmove', (e) => { e.preventDefault(); aimX = getEventX(e); }, { passive: false });
+canvas.addEventListener('touchend', (e) => { e.preventDefault(); aimX = null; }, { passive: false });
+
+// ============================================================
+// INIT
+// ============================================================
+showStartScreen();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

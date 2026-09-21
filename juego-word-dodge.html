@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Word Dodge · Vocabulary Game</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1c2422;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; color: #e8dcc8; padding: 12px;
+  }
+  #wrap {
+    background: #2a3835; border-radius: 14px; padding: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5); max-width: 100%;
+  }
+  #title {
+    text-align: center; color: #8fa89a; font-size: 0.8rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px; font-weight: 600;
+  }
+  #question {
+    text-align: center; font-size: 1.05rem; color: #e8dcc8;
+    margin-bottom: 10px; padding: 8px 12px;
+    background: rgba(30, 42, 39, 0.7);
+    border-radius: 8px;
+    border: 1px solid rgba(168, 200, 184, 0.15);
+    min-height: 42px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #question b { color: #a8c8b8; font-size: 1.25rem; margin: 0 4px; }
+  .canvas-wrap {
+    position: relative; display: inline-block;
+    line-height: 0; border-radius: 8px; overflow: hidden;
+  }
+  canvas {
+    display: block; background: #1e2a27; border-radius: 8px;
+    touch-action: none; max-width: 100%; height: auto;
+  }
+  #hud {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 6px 0; font-size: 0.95rem; flex-wrap: wrap; gap: 10px;
+  }
+  #hud span b { color: #a8c8b8; font-size: 1.05rem; }
+  #instructions {
+    text-align: center; color: #6a8078;
+    font-size: 0.78rem; margin-top: 8px;
+  }
+  /* ===== OVERLAY (Start / Game Over) ===== */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(20, 28, 26, 0.95);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 30px; text-align: center; z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay .icon {
+    font-size: 3.6rem; margin-bottom: 6px;
+    filter: drop-shadow(0 0 24px rgba(127, 184, 143, 0.5));
+  }
+  .overlay h1 {
+    color: #a8c8b8; font-size: 2rem;
+    margin-bottom: 14px; letter-spacing: 1px;
+  }
+  .overlay .desc {
+    color: #c8d8d0; font-size: 1rem;
+    margin: 4px 0; max-width: 420px; line-height: 1.55;
+  }
+  .overlay .sub {
+    color: #6a8078; font-size: 0.82rem; margin-top: 14px;
+  }
+  .overlay .stat {
+    color: #c8d8d0; font-size: 1.05rem; margin: 4px 0;
+  }
+  .overlay .stat b { color: #a8c8b8; font-size: 1.25rem; }
+  .overlay button {
+    margin-top: 26px;
+    background: #7fb88f; color: #1c2422;
+    border: none; padding: 16px 56px;
+    border-radius: 40px; font-size: 1.15rem;
+    font-weight: 800; cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 40px rgba(127, 184, 143, 0.4);
+    font-family: inherit;
+  }
+  .overlay button:hover {
+    background: #a8d8b8; transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(127, 184, 143, 0.7);
+  }
+  .overlay button:active { transform: scale(0.97); }
+  .back-button {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #7f88b8;
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 100;
+  transition: 0.2s;
+}
+
+.back-button:hover {
+  background: #a8b0d8;
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← Volver a Presenteasy</a>
+<div id="wrap">
+  <div id="title">🎯 Word Dodge · Vocabulary</div>
+  <div id="question">Presiona ▶ JUGAR para comenzar</div>
+  <div class="canvas-wrap">
+    <canvas id="game" width="640" height="640"></canvas>
+    <div class="overlay" id="overlay"></div>
+  </div>
+  <div id="hud">
+    <span>Score: <b id="score">0</b></span>
+    <span>Streak: <b id="streak">0</b></span>
+    <span>Lives: <b id="lives">❤❤❤</b></span>
+    <span>Level: <b id="level">1</b></span>
+  </div>
+  <div id="instructions">WASD / ← ↑ → ↓ o mouse para mover · Esquiva las rojas y toca la respuesta correcta</div>
+</div>
+
+<script>
+// ============================================================
+// WORD DODGE · Vocabulary Game
+// ============================================================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const MARGIN = 24;
+const ARENA = { x: MARGIN, y: MARGIN, w: W - MARGIN*2, h: H - MARGIN*2 };
+const ARENA_RIGHT = ARENA.x + ARENA.w;
+const ARENA_BOTTOM = ARENA.y + ARENA.h;
+const overlay = document.getElementById('overlay');
+const questionEl = document.getElementById('question');
+
+const vocabCategories = [
+  { name: 'animales', entries: [
+    { en: 'Dog', es: 'Perro' }, { en: 'Cat', es: 'Gato' }, { en: 'Bird', es: 'Pájaro' },
+    { en: 'Horse', es: 'Caballo' }, { en: 'Fish', es: 'Pez' }, { en: 'Cow', es: 'Vaca' },
+    { en: 'Rabbit', es: 'Conejo' }, { en: 'Lion', es: 'León' }, { en: 'Snake', es: 'Serpiente' },
+    { en: 'Bear', es: 'Oso' }, { en: 'Wolf', es: 'Lobo' }, { en: 'Tiger', es: 'Tigre' }
+  ]},
+  { name: 'colores', entries: [
+    { en: 'Red', es: 'Rojo' }, { en: 'Blue', es: 'Azul' }, { en: 'Green', es: 'Verde' },
+    { en: 'Yellow', es: 'Amarillo' }, { en: 'Black', es: 'Negro' }, { en: 'White', es: 'Blanco' },
+    { en: 'Purple', es: 'Morado' }, { en: 'Orange', es: 'Naranja' }, { en: 'Pink', es: 'Rosa' },
+    { en: 'Brown', es: 'Marrón' }, { en: 'Gray', es: 'Gris' }
+  ]},
+  { name: 'comida', entries: [
+    { en: 'Apple', es: 'Manzana' }, { en: 'Bread', es: 'Pan' }, { en: 'Cheese', es: 'Queso' },
+    { en: 'Meat', es: 'Carne' }, { en: 'Rice', es: 'Arroz' }, { en: 'Soup', es: 'Sopa' },
+    { en: 'Egg', es: 'Huevo' }, { en: 'Milk', es: 'Leche' }, { en: 'Butter', es: 'Mantequilla' },
+    { en: 'Sugar', es: 'Azúcar' }, { en: 'Salt', es: 'Sal' }
+  ]},
+  { name: 'cuerpo', entries: [
+    { en: 'Head', es: 'Cabeza' }, { en: 'Hand', es: 'Mano' }, { en: 'Foot', es: 'Pie' },
+    { en: 'Eye', es: 'Ojo' }, { en: 'Mouth', es: 'Boca' }, { en: 'Nose', es: 'Nariz' },
+    { en: 'Ear', es: 'Oreja' }, { en: 'Arm', es: 'Brazo' }, { en: 'Leg', es: 'Pierna' },
+    { en: 'Finger', es: 'Dedo' }, { en: 'Knee', es: 'Rodilla' }
+  ]},
+  { name: 'casa', entries: [
+    { en: 'Door', es: 'Puerta' }, { en: 'Window', es: 'Ventana' }, { en: 'Table', es: 'Mesa' },
+    { en: 'Chair', es: 'Silla' }, { en: 'Bed', es: 'Cama' }, { en: 'Kitchen', es: 'Cocina' },
+    { en: 'Roof', es: 'Techo' }, { en: 'Floor', es: 'Suelo' }, { en: 'Wall', es: 'Pared' },
+    { en: 'Mirror', es: 'Espejo' }, { en: 'Lamp', es: 'Lámpara' }
+  ]},
+  { name: 'naturaleza', entries: [
+    { en: 'Tree', es: 'Árbol' }, { en: 'Flower', es: 'Flor' }, { en: 'River', es: 'Río' },
+    { en: 'Mountain', es: 'Montaña' }, { en: 'Sky', es: 'Cielo' }, { en: 'Sun', es: 'Sol' },
+    { en: 'Moon', es: 'Luna' }, { en: 'Star', es: 'Estrella' }, { en: 'Cloud', es: 'Nube' },
+    { en: 'Sea', es: 'Mar' }, { en: 'Forest', es: 'Bosque' }
+  ]},
+  { name: 'ropa', entries: [
+    { en: 'Shirt', es: 'Camisa' }, { en: 'Pants', es: 'Pantalones' }, { en: 'Shoes', es: 'Zapatos' },
+    { en: 'Hat', es: 'Sombrero' }, { en: 'Dress', es: 'Vestido' }, { en: 'Jacket', es: 'Chaqueta' },
+    { en: 'Socks', es: 'Calcetines' }, { en: 'Gloves', es: 'Guantes' }, { en: 'Skirt', es: 'Falda' },
+    { en: 'Scarf', es: 'Bufanda' }, { en: 'Belt', es: 'Cinturón' }
+  ]},
+  { name: 'verbos', entries: [
+    { en: 'Run', es: 'Correr' }, { en: 'Walk', es: 'Caminar' }, { en: 'Jump', es: 'Saltar' },
+    { en: 'Sleep', es: 'Dormir' }, { en: 'Eat', es: 'Comer' }, { en: 'Drink', es: 'Beber' },
+    { en: 'Read', es: 'Leer' }, { en: 'Write', es: 'Escribir' }, { en: 'Sing', es: 'Cantar' },
+    { en: 'Dance', es: 'Bailar' }, { en: 'Swim', es: 'Nadar' }
+  ]}
+];
+
+const player = { x: W/2, y: H/2, r: 13, speed: 320, invuln: 0 };
+let redBalls = [], answerBoxes = [], currentQuestion = null;
+let score = 0, lives = 3, streak = 0, correctCount = 0, level = 1;
+let gameStarted = false, gameOver = false, ended = false;
+let flash = { text: '', color: '', timer: 0 };
+let particles = [];
+let lastTime = 0;
+const keys = {};
+let mouseTarget = null;
+
+function getLevelConfig() {
+  if (correctCount < 3)  return { reds: 2, redSpeed: 120, options: 3, name: 1 };
+  if (correctCount < 6)  return { reds: 3, redSpeed: 150, options: 3, name: 2 };
+  if (correctCount < 10) return { reds: 4, redSpeed: 180, options: 4, name: 3 };
+  if (correctCount < 14) return { reds: 5, redSpeed: 205, options: 4, name: 4 };
+  if (correctCount < 19) return { reds: 6, redSpeed: 230, options: 5, name: 5 };
+  if (correctCount < 25) return { reds: 7, redSpeed: 255, options: 5, name: 6 };
+  if (correctCount < 32) return { reds: 8, redSpeed: 280, options: 6, name: 7 };
+  return { reds: 9, redSpeed: 305, options: 6, name: 8 };
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function spawnParticles(x, y, color, count = 14) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 280,
+      vy: (Math.random() - 0.5) * 280,
+      life: 0.6, maxLife: 0.6,
+      color, size: 3 + Math.random() * 3
+    });
+  }
+}
+
+function findPlacement(boxW, boxH, existing, p) {
+  for (let a = 0; a < 250; a++) {
+    const bx = ARENA.x + 16 + Math.random() * (ARENA.w - boxW - 32);
+    const by = ARENA.y + 16 + Math.random() * (ARENA.h - boxH - 32);
+    let ok = true;
+    for (const other of existing) {
+      if (Math.abs(other.x - bx) < boxW + 20 && Math.abs(other.y - by) < boxH + 20) { ok = false; break; }
+    }
+    if (!ok) continue;
+    const pdx = p.x - (bx + boxW/2);
+    const pdy = p.y - (by + boxH/2);
+    if (Math.sqrt(pdx*pdx + pdy*pdy) < 130) continue;
+    return { x: bx, y: by };
+  }
+  return {
+    x: ARENA.x + 16 + Math.random() * (ARENA.w - boxW - 32),
+    y: ARENA.y + 16 + Math.random() * (ARENA.h - boxH - 32)
+  };
+}
+
+function startRound() {
+  const cfg = getLevelConfig();
+  level = cfg.name;
+  const cat = vocabCategories[Math.floor(Math.random() * vocabCategories.length)];
+  const correctIdx = Math.floor(Math.random() * cat.entries.length);
+  const correctEntry = cat.entries[correctIdx];
+  const wrongPool = cat.entries.filter((_, i) => i !== correctIdx);
+  shuffle(wrongPool);
+  const numWrong = Math.min(cfg.options - 1, wrongPool.length);
+  const options = [
+    { text: correctEntry.es, isCorrect: true },
+    ...wrongPool.slice(0, numWrong).map(w => ({ text: w.es, isCorrect: false }))
+  ];
+  shuffle(options);
+
+  answerBoxes = [];
+  const boxW = 126, boxH = 44;
+  options.forEach(opt => {
+    const pos = findPlacement(boxW, boxH, answerBoxes, player);
+    answerBoxes.push({
+      x: pos.x, y: pos.y, w: boxW, h: boxH,
+      text: opt.text, isCorrect: opt.isCorrect,
+      vx: (Math.random() - 0.5) * 18, vy: (Math.random() - 0.5) * 18
+    });
+  });
+
+  redBalls = [];
+  for (let i = 0; i < cfg.reds; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    redBalls.push({
+      x: ARENA.x + 40 + Math.random() * (ARENA.w - 80),
+      y: ARENA.y + 40 + Math.random() * (ARENA.h - 80),
+      vx: Math.cos(angle) * cfg.redSpeed,
+      vy: Math.sin(angle) * cfg.redSpeed,
+      r: 12, speed: cfg.redSpeed
+    });
+  }
+  currentQuestion = { prompt: correctEntry.en, correct: correctEntry.es, category: cat.name };
+  questionEl.innerHTML = '¿Qué significa <b>"' + currentQuestion.prompt + '"</b>? <span style="color:#6a8078; font-size:0.85rem;">(' + cat.name + ')</span>';
+}
+
+// ============================================================
+// START / GAME OVER SCREENS
+// ============================================================
+function showStartScreen() {
+  overlay.innerHTML = `
+    <div class="icon">🎯</div>
+    <h1>Word Dodge</h1>
+    <p class="desc">Eres una bolita. Esquiva las rojas y toca la caja con la traducción correcta.</p>
+    <p class="desc">Cada ronda se vuelve más difícil: más rojas, más rápidas y más opciones.</p>
+    <p class="sub">WASD / ← ↑ → ↓ o mouse para mover</p>
+    <button id="startBtn">▶ JUGAR</button>
+  `;
+  overlay.classList.remove('hidden');
+  document.getElementById('startBtn').addEventListener('click', startGame);
+}
+
+function startGame() {
+  score = 0; lives = 3; streak = 0; correctCount = 0; level = 1;
+  gameOver = false; gameStarted = true; ended = false;
+  particles = [];
+  flash = { text: '', color: '', timer: 0 };
+  player.x = W/2; player.y = H/2; player.invuln = 0;
+  startRound();
+  overlay.classList.add('hidden');
+}
+
+function endGame() {
+  if (ended) return;
+  ended = true;
+  gameOver = true;
+  overlay.innerHTML = `
+    <div class="icon">💀</div>
+    <h1>GAME OVER</h1>
+    <p class="stat">Puntuación: <b>${score}</b></p>
+    <p class="stat">Aciertos: <b>${correctCount}</b></p>
+    <p class="stat">Nivel alcanzado: <b>${level}</b></p>
+    <button id="startBtn">▶ JUGAR DE NUEVO</button>
+  `;
+  overlay.classList.remove('hidden');
+  document.getElementById('startBtn').addEventListener('click', startGame);
+}
+
+// ============================================================
+// LOOP
+// ============================================================
+function update(dt) {
+  // Particles always animate
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.vx *= 0.96; p.vy *= 0.96;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+  if (flash.timer > 0) flash.timer -= dt;
+  if (player.invuln > 0) player.invuln -= dt;
+
+  if (!gameStarted || gameOver) return;
+
+  // Player movement
+  let dx = 0, dy = 0;
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) dx -= 1;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += 1;
+  if (keys['ArrowUp'] || keys['w'] || keys['W']) dy -= 1;
+  if (keys['ArrowDown'] || keys['s'] || keys['S']) dy += 1;
+  if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; }
+
+  if (mouseTarget && dx === 0 && dy === 0) {
+    const tdx = mouseTarget.x - player.x;
+    const tdy = mouseTarget.y - player.y;
+    const dist = Math.sqrt(tdx*tdx + tdy*tdy);
+    if (dist > 3) {
+      const move = Math.min(player.speed * dt, dist);
+      player.x += (tdx / dist) * move;
+      player.y += (tdy / dist) * move;
+    }
+  } else {
+    player.x += dx * player.speed * dt;
+    player.y += dy * player.speed * dt;
+  }
+  player.x = Math.max(ARENA.x + player.r, Math.min(ARENA_RIGHT - player.r, player.x));
+  player.y = Math.max(ARENA.y + player.r, Math.min(ARENA_BOTTOM - player.r, player.y));
+
+  // Red balls
+  for (const rb of redBalls) {
+    rb.x += rb.vx * dt; rb.y += rb.vy * dt;
+    if (rb.x - rb.r < ARENA.x) { rb.x = ARENA.x + rb.r; rb.vx = Math.abs(rb.vx); }
+    if (rb.x + rb.r > ARENA_RIGHT) { rb.x = ARENA_RIGHT - rb.r; rb.vx = -Math.abs(rb.vx); }
+    if (rb.y - rb.r < ARENA.y) { rb.y = ARENA.y + rb.r; rb.vy = Math.abs(rb.vy); }
+    if (rb.y + rb.r > ARENA_BOTTOM) { rb.y = ARENA_BOTTOM - rb.r; rb.vy = -Math.abs(rb.vy); }
+  }
+  // Boxes drift
+  for (const box of answerBoxes) {
+    box.x += box.vx * dt; box.y += box.vy * dt;
+    if (box.x < ARENA.x + 8) { box.x = ARENA.x + 8; box.vx = Math.abs(box.vx); }
+    if (box.x + box.w > ARENA_RIGHT - 8) { box.x = ARENA_RIGHT - box.w - 8; box.vx = -Math.abs(box.vx); }
+    if (box.y < ARENA.y + 8) { box.y = ARENA.y + 8; box.vy = Math.abs(box.vy); }
+    if (box.y + box.h > ARENA_BOTTOM - 8) { box.y = ARENA_BOTTOM - box.h - 8; box.vy = -Math.abs(box.vy); }
+  }
+
+  // Collision with red balls
+  if (player.invuln <= 0) {
+    for (const rb of redBalls) {
+      const ddx = player.x - rb.x;
+      const ddy = player.y - rb.y;
+      if (ddx*ddx + ddy*ddy < (player.r + rb.r) * (player.r + rb.r)) {
+        lives--; streak = 0; player.invuln = 1.4;
+        flash = { text: '💥 ¡Golpe!', color: '#e8a898', timer: 0.6 };
+        spawnParticles(player.x, player.y, '#e8a898', 18);
+        if (lives <= 0) { endGame(); return; }
+        break;
+      }
+    }
+  }
+
+  // Collision with boxes
+  for (let i = answerBoxes.length - 1; i >= 0; i--) {
+    const box = answerBoxes[i];
+    const cx = Math.max(box.x, Math.min(player.x, box.x + box.w));
+    const cy = Math.max(box.y, Math.min(player.y, box.y + box.h));
+    const ddx = player.x - cx;
+    const ddy = player.y - cy;
+    if (ddx*ddx + ddy*ddy < player.r * player.r) {
+      if (box.isCorrect) {
+        score += 10 + streak * 2; streak++; correctCount++;
+        flash = { text: '✓ ¡Correcto!', color: '#a8d8b8', timer: 0.5 };
+        spawnParticles(player.x, player.y, '#a8d8b8', 24);
+        startRound();
+        return;
+      } else {
+        lives--; streak = 0; player.invuln = 1.2;
+        flash = { text: '✗ Incorrecto', color: '#c98b7a', timer: 0.6 };
+        spawnParticles(box.x + box.w/2, box.y + box.h/2, '#e8a898', 16);
+        answerBoxes.splice(i, 1);
+        if (lives <= 0) { endGame(); return; }
+      }
+    }
+  }
+}
+
+function drawRoundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function render() {
+  ctx.fillStyle = '#1e2a27'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(168, 200, 184, 0.25)'; ctx.lineWidth = 2;
+  ctx.strokeRect(ARENA.x, ARENA.y, ARENA.w, ARENA.h);
+  ctx.strokeStyle = 'rgba(168, 200, 184, 0.04)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 8; i++) {
+    ctx.beginPath(); ctx.moveTo(ARENA.x + ARENA.w / 8 * i, ARENA.y); ctx.lineTo(ARENA.x + ARENA.w / 8 * i, ARENA_BOTTOM); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ARENA.x, ARENA.y + ARENA.h / 8 * i); ctx.lineTo(ARENA_RIGHT, ARENA.y + ARENA.h / 8 * i); ctx.stroke();
+  }
+  for (const rb of redBalls) {
+    ctx.fillStyle = '#c96a5a';
+    ctx.beginPath(); ctx.arc(rb.x, rb.y, rb.r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#8a3a2a'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 200, 180, 0.3)';
+    ctx.beginPath(); ctx.arc(rb.x - 3, rb.y - 3, 3, 0, Math.PI * 2); ctx.fill();
+  }
+  for (const box of answerBoxes) {
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    drawRoundRect(box.x + 3, box.y + 4, box.w, box.h, 8); ctx.fill();
+    ctx.fillStyle = '#3a4a45';
+    drawRoundRect(box.x, box.y, box.w, box.h, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(168, 200, 184, 0.28)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#e8dcc8'; ctx.font = 'bold 18px Segoe UI';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(box.text, box.x + box.w/2, box.y + box.h/2 + 1);
+  }
+  ctx.textBaseline = 'alphabetic';
+
+  const visible = player.invuln <= 0 || Math.floor(player.invuln * 12) % 2 === 0;
+  if (visible) {
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.arc(player.x + 2, player.y + 3, player.r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#a8c8b8';
+    ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#5a8070'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.beginPath(); ctx.arc(player.x - 4, player.y - 4, 4, 0, Math.PI * 2); ctx.fill();
+  }
+  for (const p of particles) {
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  if (flash.timer > 0) {
+    ctx.globalAlpha = Math.min(1, flash.timer * 1.8);
+    ctx.fillStyle = flash.color; ctx.font = 'bold 34px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(flash.text, W/2, H/2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('streak').textContent = streak;
+  document.getElementById('lives').textContent = '❤'.repeat(Math.max(0, lives)) + '·'.repeat(Math.max(0, 3 - lives));
+  document.getElementById('level').textContent = level;
+}
+
+function loop(ts) {
+  const dt = Math.min(0.05, (ts - lastTime) / 1000 || 0);
+  lastTime = ts;
+  update(dt); render(); updateHUD();
+  requestAnimationFrame(loop);
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  keys[e.key] = true;
+  if (e.key === ' ' && !overlay.classList.contains('hidden')) {
+    e.preventDefault();
+    const btn = document.getElementById('startBtn');
+    if (btn) btn.click();
+  }
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  const sy = canvas.height / rect.height;
+  let cx = e.clientX, cy = e.clientY;
+  if (e.touches && e.touches[0]) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+  return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
+}
+canvas.addEventListener('mousemove', (e) => { mouseTarget = getCanvasPos(e); });
+canvas.addEventListener('mouseleave', () => { mouseTarget = null; });
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); mouseTarget = getCanvasPos(e); }, { passive: false });
+canvas.addEventListener('touchmove', (e) => { e.preventDefault(); mouseTarget = getCanvasPos(e); }, { passive: false });
+canvas.addEventListener('touchend', (e) => { e.preventDefault(); mouseTarget = null; }, { passive: false });
+
+// ============================================================
+// INIT
+// ============================================================
+showStartScreen();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
