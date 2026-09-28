@@ -11,9 +11,32 @@
     display: flex; justify-content: center; align-items: center;
     min-height: 100vh; color: #d8d8e8; padding: 12px;
   }
+  .back-btn {
+    position: fixed; top: 16px; left: 16px;
+    background: rgba(42, 46, 64, 0.9);
+    border: 1px solid rgba(168, 168, 216, 0.25);
+    color: #a8b0d8; font-weight: 700;
+    padding: 10px 20px; border-radius: 40px;
+    cursor: pointer; font-size: 0.85rem;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+  }
+  .back-btn:hover {
+    background: rgba(138, 146, 200, 0.2);
+    color: #e8e8f8;
+    border-color: rgba(168, 168, 216, 0.5);
+    transform: translateX(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
   #wrap {
     background: #2a2e40; border-radius: 14px; padding: 16px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.5); max-width: 100%;
+    margin-top: 40px;
   }
   #title {
     text-align: center; color: #8f8fb8; font-size: 0.8rem;
@@ -37,7 +60,6 @@
     text-align: center; color: #6a6a88;
     font-size: 0.78rem; margin-top: 8px;
   }
-  /* ===== OVERLAY ===== */
   .overlay {
     position: absolute; inset: 0;
     background: rgba(18, 22, 34, 0.95);
@@ -81,30 +103,14 @@
     box-shadow: 0 0 60px rgba(138, 146, 200, 0.8);
   }
   .overlay button:active { transform: scale(0.97); }
-  .back-button {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background: #7f88b8;
-  color: white;
-  text-decoration: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-family: 'Segoe UI', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  z-index: 100;
-  transition: 0.2s;
-}
-
-.back-button:hover {
-  background: #a8b0d8;
-  transform: scale(1.05);
-}
 </style>
 </head>
 <body>
-  <a href="index.html" class="back-button">← Volver a Presenteasy</a>
+
+<a href="index.html#arcade" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Volver a Presenteasy
+</a>
+
 <div id="wrap">
   <div id="title">⚡ Verb Blaster · Conjugation</div>
   <div class="canvas-wrap">
@@ -121,14 +127,15 @@
 </div>
 
 <script>
-// ============================================================
-// VERB BLASTER · Conjugation Game
-// ============================================================
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
 const overlay = document.getElementById('overlay');
 
+// ============================================================
+// VERBOS EXPANDIDOS · incluye pares que suenan parecido
+// (sing/sang/sung vs ring/rang/rung, etc.) para confundir
+// ============================================================
 const verbData = [
   { infinitive: 'go', past: 'went', participle: 'gone', gerund: 'going', wrong: 'goed' },
   { infinitive: 'eat', past: 'ate', participle: 'eaten', gerund: 'eating', wrong: 'eated' },
@@ -151,8 +158,10 @@ const verbData = [
   { infinitive: 'sleep', past: 'slept', participle: 'slept', gerund: 'sleeping', wrong: 'sleeped' },
   { infinitive: 'drink', past: 'drank', participle: 'drunk', gerund: 'drinking', wrong: 'drinked' },
   { infinitive: 'sing', past: 'sang', participle: 'sung', gerund: 'singing', wrong: 'singed' },
+  { infinitive: 'ring', past: 'rang', participle: 'rung', gerund: 'ringing', wrong: 'ringed' },
   { infinitive: 'swim', past: 'swam', participle: 'swum', gerund: 'swimming', wrong: 'swimmed' },
   { infinitive: 'begin', past: 'began', participle: 'begun', gerund: 'beginning', wrong: 'beginned' },
+  { infinitive: 'sink', past: 'sank', participle: 'sunk', gerund: 'sinking', wrong: 'sinked' },
   { infinitive: 'forget', past: 'forgot', participle: 'forgotten', gerund: 'forgetting', wrong: 'forgeted' },
   { infinitive: 'choose', past: 'chose', participle: 'chosen', gerund: 'choosing', wrong: 'choosed' },
   { infinitive: 'fall', past: 'fell', participle: 'fallen', gerund: 'falling', wrong: 'falled' },
@@ -176,7 +185,36 @@ const verbData = [
   { infinitive: 'steal', past: 'stole', participle: 'stolen', gerund: 'stealing', wrong: 'stealed' },
   { infinitive: 'wear', past: 'wore', participle: 'worn', gerund: 'wearing', wrong: 'weared' },
   { infinitive: 'win', past: 'won', participle: 'won', gerund: 'winning', wrong: 'winned' },
-  { infinitive: 'become', past: 'became', participle: 'become', gerund: 'becoming', wrong: 'becomed' }
+  { infinitive: 'become', past: 'became', participle: 'become', gerund: 'becoming', wrong: 'becomed' },
+  // ===== NUEVOS VERBOS =====
+  { infinitive: 'draw', past: 'drew', participle: 'drawn', gerund: 'drawing', wrong: 'drawed' },
+  { infinitive: 'grow', past: 'grew', participle: 'grown', gerund: 'growing', wrong: 'growed' },
+  { infinitive: 'throw', past: 'threw', participle: 'thrown', gerund: 'throwing', wrong: 'throwed' },
+  { infinitive: 'blow', past: 'blew', participle: 'blown', gerund: 'blowing', wrong: 'blowed' },
+  { infinitive: 'know', past: 'knew', participle: 'known', gerund: 'knowing', wrong: 'knowed' },
+  { infinitive: 'show', past: 'showed', participle: 'shown', gerund: 'showing', wrong: 'showen' },
+  { infinitive: 'grow', past: 'grew', participle: 'grown', gerund: 'growing', wrong: 'growed' },
+  { infinitive: 'hide', past: 'hid', participle: 'hidden', gerund: 'hiding', wrong: 'hided' },
+  { infinitive: 'bite', past: 'bit', participle: 'bitten', gerund: 'biting', wrong: 'bited' },
+  { infinitive: 'shake', past: 'shook', participle: 'shaken', gerund: 'shaking', wrong: 'shaked' },
+  { infinitive: 'wake', past: 'woke', participle: 'woken', gerund: 'waking', wrong: 'waked' },
+  { infinitive: 'freeze', past: 'froze', participle: 'frozen', gerund: 'freezing', wrong: 'freezed' },
+  { infinitive: 'steal', past: 'stole', participle: 'stolen', gerund: 'stealing', wrong: 'stealed' },
+  { infinitive: 'fall', past: 'fell', participle: 'fallen', gerund: 'falling', wrong: 'falled' },
+  { infinitive: 'forgive', past: 'forgave', participle: 'forgiven', gerund: 'forgiving', wrong: 'forgived' },
+  { infinitive: 'lead', past: 'led', participle: 'led', gerund: 'leading', wrong: 'leaded' },
+  { infinitive: 'feed', past: 'fed', participle: 'fed', gerund: 'feeding', wrong: 'feeded' },
+  { infinitive: 'fight', past: 'fought', participle: 'fought', gerund: 'fighting', wrong: 'fighted' },
+  { infinitive: 'seek', past: 'sought', participle: 'sought', gerund: 'seeking', wrong: 'seeked' },
+  { infinitive: 'spend', past: 'spent', participle: 'spent', gerund: 'spending', wrong: 'spended' },
+  { infinitive: 'build', past: 'built', participle: 'built', gerund: 'building', wrong: 'builded' },
+  { infinitive: 'lend', past: 'lent', participle: 'lent', gerund: 'lending', wrong: 'lended' },
+  { infinitive: 'bend', past: 'bent', participle: 'bent', gerund: 'bending', wrong: 'bended' },
+  { infinitive: 'hold', past: 'held', participle: 'held', gerund: 'holding', wrong: 'holded' },
+  { infinitive: 'hurt', past: 'hurt', participle: 'hurt', gerund: 'hurting', wrong: 'hurted' },
+  { infinitive: 'cut', past: 'cut', participle: 'cut', gerund: 'cutting', wrong: 'cutted' },
+  { infinitive: 'set', past: 'set', participle: 'set', gerund: 'setting', wrong: 'setted' },
+  { infinitive: 'shut', past: 'shut', participle: 'shut', gerund: 'shutting', wrong: 'shutted' }
 ];
 
 const player = { x: W/2 - 22, y: H - 62, w: 44, h: 44, speed: 540 };
@@ -273,9 +311,6 @@ function startRound() {
   currentQuestion = { prompt: ask.label + ' de "' + shownForm.toUpperCase() + '"', correct: correctForm };
 }
 
-// ============================================================
-// START / GAME OVER SCREENS
-// ============================================================
 function showStartScreen() {
   overlay.innerHTML = `
     <div class="icon">⚡</div>
@@ -499,9 +534,6 @@ function loop(ts) {
   requestAnimationFrame(loop);
 }
 
-// ============================================================
-// INPUT
-// ============================================================
 document.addEventListener('keydown', (e) => {
   keys[e.key] = true;
   if (e.key === ' ') {
@@ -541,9 +573,6 @@ canvas.addEventListener('touchstart', (e) => {
 canvas.addEventListener('touchmove', (e) => { e.preventDefault(); aimX = getEventX(e); }, { passive: false });
 canvas.addEventListener('touchend', (e) => { e.preventDefault(); aimX = null; }, { passive: false });
 
-// ============================================================
-// INIT
-// ============================================================
 showStartScreen();
 requestAnimationFrame(loop);
 </script>
