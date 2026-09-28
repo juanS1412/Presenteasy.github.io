@@ -11,9 +11,32 @@
     display: flex; justify-content: center; align-items: center;
     min-height: 100vh; color: #e8dcc8; padding: 12px;
   }
+  .back-btn {
+    position: fixed; top: 16px; left: 16px;
+    background: rgba(42, 56, 53, 0.9);
+    border: 1px solid rgba(168, 200, 184, 0.25);
+    color: #a8c8b8; font-weight: 700;
+    padding: 10px 20px; border-radius: 40px;
+    cursor: pointer; font-size: 0.85rem;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+  }
+  .back-btn:hover {
+    background: rgba(127, 184, 143, 0.18);
+    color: #e8dcc8;
+    border-color: rgba(168, 200, 184, 0.5);
+    transform: translateX(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
   #wrap {
     background: #2a3835; border-radius: 14px; padding: 16px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.5); max-width: 100%;
+    margin-top: 40px;
   }
   #title {
     text-align: center; color: #8fa89a; font-size: 0.8rem;
@@ -47,7 +70,6 @@
     text-align: center; color: #6a8078;
     font-size: 0.78rem; margin-top: 8px;
   }
-  /* ===== OVERLAY (Start / Game Over) ===== */
   .overlay {
     position: absolute; inset: 0;
     background: rgba(20, 28, 26, 0.95);
@@ -91,30 +113,14 @@
     box-shadow: 0 0 60px rgba(127, 184, 143, 0.7);
   }
   .overlay button:active { transform: scale(0.97); }
-  .back-button {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background: #7f88b8;
-  color: white;
-  text-decoration: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-family: 'Segoe UI', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  z-index: 100;
-  transition: 0.2s;
-}
-
-.back-button:hover {
-  background: #a8b0d8;
-  transform: scale(1.05);
-}
 </style>
 </head>
 <body>
-  <a href="index.html" class="back-button">← Volver a Presenteasy</a>
+
+<a href="index.html#arcade" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Volver a Presenteasy
+</a>
+
 <div id="wrap">
   <div id="title">🎯 Word Dodge · Vocabulary</div>
   <div id="question">Presiona ▶ JUGAR para comenzar</div>
@@ -132,9 +138,6 @@
 </div>
 
 <script>
-// ============================================================
-// WORD DODGE · Vocabulary Game
-// ============================================================
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
@@ -145,54 +148,107 @@ const ARENA_BOTTOM = ARENA.y + ARENA.h;
 const overlay = document.getElementById('overlay');
 const questionEl = document.getElementById('question');
 
+// ============================================================
+// CATEGORÍAS EXPANDIDAS · opciones del mismo campo semántico
+// ============================================================
 const vocabCategories = [
   { name: 'animales', entries: [
     { en: 'Dog', es: 'Perro' }, { en: 'Cat', es: 'Gato' }, { en: 'Bird', es: 'Pájaro' },
     { en: 'Horse', es: 'Caballo' }, { en: 'Fish', es: 'Pez' }, { en: 'Cow', es: 'Vaca' },
     { en: 'Rabbit', es: 'Conejo' }, { en: 'Lion', es: 'León' }, { en: 'Snake', es: 'Serpiente' },
-    { en: 'Bear', es: 'Oso' }, { en: 'Wolf', es: 'Lobo' }, { en: 'Tiger', es: 'Tigre' }
+    { en: 'Bear', es: 'Oso' }, { en: 'Wolf', es: 'Lobo' }, { en: 'Tiger', es: 'Tigre' },
+    { en: 'Elephant', es: 'Elefante' }, { en: 'Monkey', es: 'Mono' }, { en: 'Giraffe', es: 'Jirafa' },
+    { en: 'Shark', es: 'Tiburón' }, { en: 'Dolphin', es: 'Delfín' }, { en: 'Eagle', es: 'Águila' },
+    { en: 'Frog', es: 'Rana' }, { en: 'Spider', es: 'Araña' }, { en: 'Bee', es: 'Abeja' },
+    { en: 'Butterfly', es: 'Mariposa' }, { en: 'Penguin', es: 'Pingüino' }, { en: 'Whale', es: 'Ballena' },
+    { en: 'Fox', es: 'Zorro' }, { en: 'Deer', es: 'Ciervo' }, { en: 'Mouse', es: 'Ratón' },
+    { en: 'Owl', es: 'Búho' }, { en: 'Duck', es: 'Pato' }, { en: 'Goat', es: 'Cabra' }
   ]},
   { name: 'colores', entries: [
     { en: 'Red', es: 'Rojo' }, { en: 'Blue', es: 'Azul' }, { en: 'Green', es: 'Verde' },
     { en: 'Yellow', es: 'Amarillo' }, { en: 'Black', es: 'Negro' }, { en: 'White', es: 'Blanco' },
     { en: 'Purple', es: 'Morado' }, { en: 'Orange', es: 'Naranja' }, { en: 'Pink', es: 'Rosa' },
-    { en: 'Brown', es: 'Marrón' }, { en: 'Gray', es: 'Gris' }
+    { en: 'Brown', es: 'Marrón' }, { en: 'Gray', es: 'Gris' }, { en: 'Gold', es: 'Dorado' },
+    { en: 'Silver', es: 'Plateado' }, { en: 'Turquoise', es: 'Turquesa' }, { en: 'Violet', es: 'Violeta' },
+    { en: 'Beige', es: 'Beige' }, { en: 'Navy', es: 'Azul marino' }, { en: 'Crimson', es: 'Carmesí' }
   ]},
   { name: 'comida', entries: [
     { en: 'Apple', es: 'Manzana' }, { en: 'Bread', es: 'Pan' }, { en: 'Cheese', es: 'Queso' },
     { en: 'Meat', es: 'Carne' }, { en: 'Rice', es: 'Arroz' }, { en: 'Soup', es: 'Sopa' },
     { en: 'Egg', es: 'Huevo' }, { en: 'Milk', es: 'Leche' }, { en: 'Butter', es: 'Mantequilla' },
-    { en: 'Sugar', es: 'Azúcar' }, { en: 'Salt', es: 'Sal' }
+    { en: 'Sugar', es: 'Azúcar' }, { en: 'Salt', es: 'Sal' }, { en: 'Chicken', es: 'Pollo' },
+    { en: 'Fish', es: 'Pescado' }, { en: 'Pizza', es: 'Pizza' }, { en: 'Salad', es: 'Ensalada' },
+    { en: 'Coffee', es: 'Café' }, { en: 'Tea', es: 'Té' }, { en: 'Juice', es: 'Jugo' },
+    { en: 'Water', es: 'Agua' }, { en: 'Wine', es: 'Vino' }, { en: 'Beer', es: 'Cerveza' },
+    { en: 'Onion', es: 'Cebolla' }, { en: 'Garlic', es: 'Ajo' }, { en: 'Pepper', es: 'Pimienta' }
   ]},
   { name: 'cuerpo', entries: [
     { en: 'Head', es: 'Cabeza' }, { en: 'Hand', es: 'Mano' }, { en: 'Foot', es: 'Pie' },
     { en: 'Eye', es: 'Ojo' }, { en: 'Mouth', es: 'Boca' }, { en: 'Nose', es: 'Nariz' },
     { en: 'Ear', es: 'Oreja' }, { en: 'Arm', es: 'Brazo' }, { en: 'Leg', es: 'Pierna' },
-    { en: 'Finger', es: 'Dedo' }, { en: 'Knee', es: 'Rodilla' }
+    { en: 'Finger', es: 'Dedo' }, { en: 'Knee', es: 'Rodilla' }, { en: 'Shoulder', es: 'Hombro' },
+    { en: 'Elbow', es: 'Codo' }, { en: 'Wrist', es: 'Muñeca' }, { en: 'Ankle', es: 'Tobillo' },
+    { en: 'Neck', es: 'Cuello' }, { en: 'Back', es: 'Espalda' }, { en: 'Chest', es: 'Pecho' },
+    { en: 'Stomach', es: 'Estómago' }, { en: 'Throat', es: 'Garganta' }, { en: 'Tongue', es: 'Lengua' },
+    { en: 'Tooth', es: 'Diente' }, { en: 'Hair', es: 'Cabello' }, { en: 'Skin', es: 'Piel' }
   ]},
   { name: 'casa', entries: [
     { en: 'Door', es: 'Puerta' }, { en: 'Window', es: 'Ventana' }, { en: 'Table', es: 'Mesa' },
     { en: 'Chair', es: 'Silla' }, { en: 'Bed', es: 'Cama' }, { en: 'Kitchen', es: 'Cocina' },
     { en: 'Roof', es: 'Techo' }, { en: 'Floor', es: 'Suelo' }, { en: 'Wall', es: 'Pared' },
-    { en: 'Mirror', es: 'Espejo' }, { en: 'Lamp', es: 'Lámpara' }
+    { en: 'Mirror', es: 'Espejo' }, { en: 'Lamp', es: 'Lámpara' }, { en: 'Sofa', es: 'Sofá' },
+    { en: 'Carpet', es: 'Alfombra' }, { en: 'Shelf', es: 'Estante' }, { en: 'Drawer', es: 'Cajón' },
+    { en: 'Stairs', es: 'Escaleras' }, { en: 'Garage', es: 'Garaje' }, { en: 'Garden', es: 'Jardín' },
+    { en: 'Bathroom', es: 'Baño' }, { en: 'Bedroom', es: 'Habitación' }
   ]},
   { name: 'naturaleza', entries: [
     { en: 'Tree', es: 'Árbol' }, { en: 'Flower', es: 'Flor' }, { en: 'River', es: 'Río' },
     { en: 'Mountain', es: 'Montaña' }, { en: 'Sky', es: 'Cielo' }, { en: 'Sun', es: 'Sol' },
     { en: 'Moon', es: 'Luna' }, { en: 'Star', es: 'Estrella' }, { en: 'Cloud', es: 'Nube' },
-    { en: 'Sea', es: 'Mar' }, { en: 'Forest', es: 'Bosque' }
+    { en: 'Sea', es: 'Mar' }, { en: 'Forest', es: 'Bosque' }, { en: 'Beach', es: 'Playa' },
+    { en: 'Desert', es: 'Desierto' }, { en: 'Jungle', es: 'Jungla' }, { en: 'Valley', es: 'Valle' },
+    { en: 'Lake', es: 'Lago' }, { en: 'Island', es: 'Isla' }, { en: 'Rain', es: 'Lluvia' },
+    { en: 'Snow', es: 'Nieve' }, { en: 'Wind', es: 'Viento' }
   ]},
   { name: 'ropa', entries: [
     { en: 'Shirt', es: 'Camisa' }, { en: 'Pants', es: 'Pantalones' }, { en: 'Shoes', es: 'Zapatos' },
     { en: 'Hat', es: 'Sombrero' }, { en: 'Dress', es: 'Vestido' }, { en: 'Jacket', es: 'Chaqueta' },
     { en: 'Socks', es: 'Calcetines' }, { en: 'Gloves', es: 'Guantes' }, { en: 'Skirt', es: 'Falda' },
-    { en: 'Scarf', es: 'Bufanda' }, { en: 'Belt', es: 'Cinturón' }
+    { en: 'Scarf', es: 'Bufanda' }, { en: 'Belt', es: 'Cinturón' }, { en: 'Tie', es: 'Corbata' },
+    { en: 'Boots', es: 'Botas' }, { en: 'Shorts', es: 'Pantaloneta' }, { en: 'Sweater', es: 'Suéter' },
+    { en: 'Coat', es: 'Abrigo' }, { en: 'Cap', es: 'Gorra' }, { en: 'Suit', es: 'Traje' }
   ]},
   { name: 'verbos', entries: [
     { en: 'Run', es: 'Correr' }, { en: 'Walk', es: 'Caminar' }, { en: 'Jump', es: 'Saltar' },
     { en: 'Sleep', es: 'Dormir' }, { en: 'Eat', es: 'Comer' }, { en: 'Drink', es: 'Beber' },
     { en: 'Read', es: 'Leer' }, { en: 'Write', es: 'Escribir' }, { en: 'Sing', es: 'Cantar' },
-    { en: 'Dance', es: 'Bailar' }, { en: 'Swim', es: 'Nadar' }
+    { en: 'Dance', es: 'Bailar' }, { en: 'Swim', es: 'Nadar' }, { en: 'Speak', es: 'Hablar' },
+    { en: 'Listen', es: 'Escuchar' }, { en: 'Think', es: 'Pensar' }, { en: 'Feel', es: 'Sentir' },
+    { en: 'Laugh', es: 'Reír' }, { en: 'Cry', es: 'Llorar' }, { en: 'Study', es: 'Estudiar' },
+    { en: 'Teach', es: 'Enseñar' }, { en: 'Learn', es: 'Aprender' }
+  ]},
+  // ===== CATEGORÍAS NUEVAS =====
+  { name: 'profesiones', entries: [
+    { en: 'Doctor', es: 'Médico' }, { en: 'Teacher', es: 'Maestro' }, { en: 'Lawyer', es: 'Abogado' },
+    { en: 'Engineer', es: 'Ingeniero' }, { en: 'Nurse', es: 'Enfermero' }, { en: 'Chef', es: 'Cocinero' },
+    { en: 'Farmer', es: 'Granjero' }, { en: 'Police officer', es: 'Policía' }, { en: 'Firefighter', es: 'Bombero' },
+    { en: 'Pilot', es: 'Piloto' }, { en: 'Driver', es: 'Conductor' }, { en: 'Artist', es: 'Artista' },
+    { en: 'Singer', es: 'Cantante' }, { en: 'Actor', es: 'Actor' }, { en: 'Writer', es: 'Escritor' },
+    { en: 'Scientist', es: 'Científico' }, { en: 'Dentist', es: 'Dentista' }, { en: 'Baker', es: 'Panadero' }
+  ]},
+  { name: 'transporte', entries: [
+    { en: 'Car', es: 'Coche' }, { en: 'Bus', es: 'Autobús' }, { en: 'Train', es: 'Tren' },
+    { en: 'Plane', es: 'Avión' }, { en: 'Ship', es: 'Barco' }, { en: 'Boat', es: 'Bote' },
+    { en: 'Bicycle', es: 'Bicicleta' }, { en: 'Motorcycle', es: 'Motocicleta' }, { en: 'Truck', es: 'Camión' },
+    { en: 'Taxi', es: 'Taxi' }, { en: 'Helicopter', es: 'Helicóptero' }, { en: 'Submarine', es: 'Submarino' },
+    { en: 'Rocket', es: 'Cohete' }, { en: 'Scooter', es: 'Patinete' }
+  ]},
+  { name: 'deportes', entries: [
+    { en: 'Soccer', es: 'Fútbol' }, { en: 'Basketball', es: 'Baloncesto' }, { en: 'Tennis', es: 'Tenis' },
+    { en: 'Baseball', es: 'Béisbol' }, { en: 'Volleyball', es: 'Voleibol' }, { en: 'Swimming', es: 'Natación' },
+    { en: 'Running', es: 'Atletismo' }, { en: 'Cycling', es: 'Ciclismo' }, { en: 'Boxing', es: 'Boxeo' },
+    { en: 'Golf', es: 'Golf' }, { en: 'Hockey', es: 'Hockey' }, { en: 'Rugby', es: 'Rugby' },
+    { en: 'Surfing', es: 'Surf' }, { en: 'Skiing', es: 'Esquí' }, { en: 'Skating', es: 'Patinaje' }
   ]}
 ];
 
@@ -298,9 +354,6 @@ function startRound() {
   questionEl.innerHTML = '¿Qué significa <b>"' + currentQuestion.prompt + '"</b>? <span style="color:#6a8078; font-size:0.85rem;">(' + cat.name + ')</span>';
 }
 
-// ============================================================
-// START / GAME OVER SCREENS
-// ============================================================
 function showStartScreen() {
   overlay.innerHTML = `
     <div class="icon">🎯</div>
@@ -340,11 +393,7 @@ function endGame() {
   document.getElementById('startBtn').addEventListener('click', startGame);
 }
 
-// ============================================================
-// LOOP
-// ============================================================
 function update(dt) {
-  // Particles always animate
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.x += p.vx * dt; p.y += p.vy * dt;
@@ -357,7 +406,6 @@ function update(dt) {
 
   if (!gameStarted || gameOver) return;
 
-  // Player movement
   let dx = 0, dy = 0;
   if (keys['ArrowLeft'] || keys['a'] || keys['A']) dx -= 1;
   if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += 1;
@@ -381,7 +429,6 @@ function update(dt) {
   player.x = Math.max(ARENA.x + player.r, Math.min(ARENA_RIGHT - player.r, player.x));
   player.y = Math.max(ARENA.y + player.r, Math.min(ARENA_BOTTOM - player.r, player.y));
 
-  // Red balls
   for (const rb of redBalls) {
     rb.x += rb.vx * dt; rb.y += rb.vy * dt;
     if (rb.x - rb.r < ARENA.x) { rb.x = ARENA.x + rb.r; rb.vx = Math.abs(rb.vx); }
@@ -389,7 +436,6 @@ function update(dt) {
     if (rb.y - rb.r < ARENA.y) { rb.y = ARENA.y + rb.r; rb.vy = Math.abs(rb.vy); }
     if (rb.y + rb.r > ARENA_BOTTOM) { rb.y = ARENA_BOTTOM - rb.r; rb.vy = -Math.abs(rb.vy); }
   }
-  // Boxes drift
   for (const box of answerBoxes) {
     box.x += box.vx * dt; box.y += box.vy * dt;
     if (box.x < ARENA.x + 8) { box.x = ARENA.x + 8; box.vx = Math.abs(box.vx); }
@@ -398,7 +444,6 @@ function update(dt) {
     if (box.y + box.h > ARENA_BOTTOM - 8) { box.y = ARENA_BOTTOM - box.h - 8; box.vy = -Math.abs(box.vy); }
   }
 
-  // Collision with red balls
   if (player.invuln <= 0) {
     for (const rb of redBalls) {
       const ddx = player.x - rb.x;
@@ -413,7 +458,6 @@ function update(dt) {
     }
   }
 
-  // Collision with boxes
   for (let i = answerBoxes.length - 1; i >= 0; i--) {
     const box = answerBoxes[i];
     const cx = Math.max(box.x, Math.min(player.x, box.x + box.w));
@@ -518,9 +562,6 @@ function loop(ts) {
   requestAnimationFrame(loop);
 }
 
-// ============================================================
-// INPUT
-// ============================================================
 document.addEventListener('keydown', (e) => {
   keys[e.key] = true;
   if (e.key === ' ' && !overlay.classList.contains('hidden')) {
@@ -546,9 +587,6 @@ canvas.addEventListener('touchstart', (e) => { e.preventDefault(); mouseTarget =
 canvas.addEventListener('touchmove', (e) => { e.preventDefault(); mouseTarget = getCanvasPos(e); }, { passive: false });
 canvas.addEventListener('touchend', (e) => { e.preventDefault(); mouseTarget = null; }, { passive: false });
 
-// ============================================================
-// INIT
-// ============================================================
 showStartScreen();
 requestAnimationFrame(loop);
 </script>
